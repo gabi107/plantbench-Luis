@@ -1,0 +1,631 @@
+Operating-regime discovery on data/regimes: 2016 runs with trajectories
+dataset data/regimes, pb-spec:6a6fc673261b, pb-protocol:dab0d47475e9, 2016 runs, generated at no commit
+analyzed at 6fc4e69 clean with plantbench 0.1.0, Python 3.14.7, NumPy 2.5.3, SciPy 1.18.1, scikit-learn 1.9.1, pacmap 0.9.1, hdbscan 0.8.44
+
+========================================================================================
+1.  DATASET
+========================================================================================
+runs 2016: ok 2016
+outcomes: settled 1581 (78.4%), saturated 0 (0.0%), unsettled 353 (17.5%), limit cycle 82 (4.1%)
+
+outcome by plant
+                                      settled    saturated    unsettled  limit cycle
+  D1                                      238            0           48            2
+  D3                                      240            0           48            0
+  D4 share 0.0                            237            0           48            3
+  D4 share 0.3                            231            0           48            9
+  D4 share 0.5                            219            0           54           15
+  D4 share 0.7                            176            0           59           53
+  D5                                      240            0           48            0
+
+outcome by upset
+                                      settled    saturated    unsettled  limit cycle
+  fresh feed -10 K                        333            0            1            2
+  inert +50%                                0            0          325           11
+  reactor C_A set-point -0.05             332            0            0            4
+  throughput +10%                         303            0           19           14
+  throughput +20%                         278            0            8           50
+  throughput -10%                         335            0            0            1
+
+limit cycles by analyzer deadtime
+  D4 share 0.7, deadtime  0.0- 2.5 min:  35 of  72 runs
+  D4 share 0.7, deadtime  2.5- 5.0 min:   8 of  72 runs
+  D4 share 0.7, deadtime  5.0- 7.5 min:   2 of  72 runs
+  D4 share 0.7, deadtime  7.5-10.0 min:   8 of  72 runs
+
+limit cycles at D4 share 0.7 by quarter of each sampled coordinate
+  deadtime 35/72   8/72   2/72   8/72   spread of the share 0.458   ROC AUC 0.767
+  Kc       13/72   8/72  12/72  20/72   spread of the share 0.167   ROC AUC 0.582
+  tau_I    18/72  15/72  13/72   7/72   spread of the share 0.153   ROC AUC 0.605
+
+cost of a run by outcome (wall time of the integration)
+  settled      n  1581   median    3.52 s   90th percentile   15.94 s   max    93.9 s
+  unsettled    n   353   median    2.18 s   90th percentile   13.71 s   max   248.1 s
+  limit cycle  n    82   median   86.60 s   90th percentile  152.75 s   max   179.7 s
+  wall time as a detector of limit cycles: ROC AUC 0.986
+  total 6.89 h of integration
+
+========================================================================================
+2.  THE LINEAR FEATURE AGAINST THE OUTCOME
+========================================================================================
+  settled      damping ratio median 0.166   range 0.006-0.467
+  unsettled    damping ratio median 0.154   range 0.006-0.457
+  limit cycle  damping ratio median 0.036   range -0.064-0.281
+  damping ratio as a detector of limit cycles (lower = cycle): ROC AUC 0.872
+  best single threshold: damping < 0.0755, balanced accuracy 0.826
+  largest damping ratio among limit cycles 0.2813; runs at or below it that do not cycle: 1803
+
+========================================================================================
+3.  LATE WINDOW, GLOBAL STRUCTURE: DEVIATIONS FROM THE DESIGN POINT
+========================================================================================
+observations 62496 time samples x 16 variables, 31 per run over 1200-1500 min, each the mean of 5 samples; z-scored
+cleaning: dropped as round-off (spread below 1e-08 of level): none
+HDBSCAN min_cluster_size 155 (the late windows of 5 runs)
+
+  method   seed dims clusters  noise    DBI  purity ARI outcome ARI plant ARI upset
+  PCA         0    5       42   7.0%  2.534   0.994       0.023     0.242     0.229
+  t-SNE       0    2       32  35.0%  1.652   0.964       0.017     0.260     0.272
+  t-SNE       1    2       32  35.0%  1.652   0.964       0.017     0.260     0.272
+  t-SNE       2    2       32  35.0%  1.652   0.964       0.017     0.260     0.272
+  PaCMAP      0    2       71  18.7%  1.380   0.964       0.015     0.168     0.183
+  PaCMAP      1    2       60  12.5%  1.482   0.961       0.029     0.124     0.328
+  PaCMAP      2    2       62  14.2%  2.025   0.963       0.021     0.157     0.270
+
+stability across seeds: ARI between the clusterings of two seeds
+  t-SNE    mean 1.000   min 1.000
+  PaCMAP   mean 0.407   min 0.347
+
+PaCMAP clusters (seed 0): composition by outcome, and the plants and upsets they hold
+  noise       11664 samples of 1016 runs   settled 6778, unsettled 4700, limit cycle 186   | D5 2711; D3 1724   | inert +50% 4725; reactor C_A set-point -0.05 4546
+  cluster 0    1494 samples of   49 runs   settled 1488, limit cycle 6   | D1 1488; D4 share 0.7 6   | throughput -10% 1494
+  cluster 1    1488 samples of   48 runs   settled 1488   | D3 1488   | throughput +20% 1488
+  cluster 2     460 samples of   46 runs   settled 460   | D1 460   | throughput +20% 460
+  cluster 3     506 samples of   46 runs   settled 506   | D1 506   | throughput +20% 506
+  cluster 4    1488 samples of   48 runs   settled 1488   | D5 1488   | throughput -10% 1488
+  cluster 5    1435 samples of  105 runs   settled 1431, unsettled 4   | D4 share 0.3 556; D1 433   | fresh feed -10 K 1435
+  cluster 6    1028 samples of   58 runs   limit cycle 1028   | D4 share 0.7 642; D4 share 0.5 179   | throughput +20% 739; throughput +10% 174
+  cluster 7    1191 samples of   52 runs   settled 1181, unsettled 7, limit cycle 3   | D4 share 0.0 1150; D4 share 0.5 39   | throughput +20% 1191
+  cluster 8    1490 samples of   49 runs   settled 1488, limit cycle 2   | D4 share 0.0 1488; D4 share 0.7 2   | throughput -10% 1490
+  cluster 9    1488 samples of   48 runs   settled 1488   | D4 share 0.3 1488   | throughput -10% 1488
+  cluster 10    167 samples of   39 runs   settled 167   | D4 share 0.0 110; D4 share 0.3 56   | fresh feed -10 K 167
+  cluster 11    460 samples of   46 runs   settled 460   | D1 460   | throughput +20% 460
+  cluster 12   1139 samples of   82 runs   settled 1135, limit cycle 4   | D4 share 0.5 639; D4 share 0.3 422   | fresh feed -10 K 1139
+  cluster 13    265 samples of   19 runs   settled 265   | D4 share 0.7 265   | fresh feed -10 K 265
+  cluster 14   1498 samples of   54 runs   settled 1488, limit cycle 10   | D5 1488; D4 share 0.7 8   | fresh feed -10 K 1492; reactor C_A set-point -0.05 3
+  cluster 15    267 samples of   14 runs   settled 267   | D4 share 0.7 236; D4 share 0.5 31   | fresh feed -10 K 267
+  cluster 16    215 samples of   48 runs   settled 214, unsettled 1   | D4 share 0.0 134; D4 share 0.3 48   | fresh feed -10 K 215
+  cluster 17   1116 samples of   63 runs   settled 1116   | D4 share 0.5 530; D4 share 0.7 455   | fresh feed -10 K 1116
+  cluster 18    378 samples of   47 runs   settled 378   | D4 share 0.7 378   | throughput -10% 378
+  cluster 19   1540 samples of   97 runs   settled 1536, limit cycle 4   | D3 1488; D5 48   | throughput -10% 1492; reactor C_A set-point -0.05 48
+  cluster 20    717 samples of   36 runs   settled 717   | D3 717   | fresh feed -10 K 717
+  cluster 21   1206 samples of   47 runs   settled 775, unsettled 356, limit cycle 75   | D4 share 0.7 1076; D4 share 0.5 123   | throughput +10% 1206
+  cluster 22    186 samples of   34 runs   settled 186   | D1 186   | fresh feed -10 K 186
+  cluster 23    179 samples of   55 runs   settled 179   | D1 139; D3 40   | fresh feed -10 K 179
+  cluster 24    363 samples of   42 runs   settled 351, unsettled 5, limit cycle 7   | D4 share 0.0 283; D4 share 0.3 74   | fresh feed -10 K 363
+  cluster 25    188 samples of   18 runs   settled 188   | D4 share 0.7 170; D4 share 0.5 18   | fresh feed -10 K 188
+  cluster 26    549 samples of   44 runs   settled 510, unsettled 21, limit cycle 18   | D4 share 0.0 266; D1 142   | fresh feed -10 K 549
+  cluster 27    184 samples of   29 runs   settled 184   | D3 184   | fresh feed -10 K 184
+  cluster 28    730 samples of   46 runs   settled 730   | D4 share 0.3 730   | throughput +10% 730
+  cluster 29    698 samples of   48 runs   settled 696, unsettled 2   | D4 share 0.3 696; D4 share 0.7 2   | throughput +10% 698
+  cluster 30    193 samples of   48 runs   unsettled 193   | D5 193   | inert +50% 193
+  cluster 31    543 samples of   50 runs   unsettled 540, limit cycle 3   | D1 540; D4 share 0.7 3   | inert +50% 540; throughput +10% 3
+  cluster 32   1080 samples of   48 runs   settled 1079, limit cycle 1   | D4 share 0.7 1080   | throughput -10% 1080
+  cluster 33   1488 samples of   48 runs   settled 1488   | D4 share 0.5 1488   | throughput -10% 1488
+  cluster 34    588 samples of   43 runs   settled 587, unsettled 1   | D4 share 0.3 587; D4 share 0.5 1   | throughput +20% 588
+  cluster 35    254 samples of   29 runs   settled 254   | D1 254   | fresh feed -10 K 254
+  cluster 36    204 samples of   56 runs   settled 204   | D4 share 0.5 96; D4 share 0.0 45   | fresh feed -10 K 204
+  cluster 37   1140 samples of   48 runs   settled 1130, unsettled 10   | D4 share 0.5 880; D4 share 0.7 260   | throughput +20% 1140
+  cluster 38    675 samples of   65 runs   settled 302, unsettled 168, limit cycle 205   | D4 share 0.7 332; D5 284   | throughput +20% 675
+  cluster 39    343 samples of   71 runs   settled 343   | D4 share 0.0 152; D4 share 0.3 125   | fresh feed -10 K 343
+  cluster 40    505 samples of   48 runs   settled 505   | D5 505   | throughput +20% 505
+  cluster 41    664 samples of   93 runs   settled 656, unsettled 8   | D4 share 0.3 554; D5 102   | throughput +20% 664
+  cluster 42   2292 samples of  162 runs   settled 1516, unsettled 38, limit cycle 738   | D4 share 0.5 1392; D4 share 0.7 458   | throughput +10% 1419; throughput +20% 811
+  cluster 43    231 samples of   22 runs   unsettled 193, limit cycle 38   | D4 share 0.7 134; D4 share 0.5 76   | throughput +10% 231
+  cluster 44   1491 samples of   51 runs   settled 1490, limit cycle 1   | D4 share 0.0 1488; D5 2   | throughput +10% 1490; reactor C_A set-point -0.05 1
+  cluster 45   2540 samples of   96 runs   settled 2540   | D3 1488; D5 1052   | throughput +10% 2540
+  cluster 46    344 samples of   99 runs   unsettled 337, limit cycle 7   | D4 share 0.3 288; D4 share 0.5 46   | inert +50% 344
+  cluster 47    628 samples of   96 runs   unsettled 628   | D4 share 0.0 388; D3 240   | inert +50% 628
+  cluster 48    506 samples of  143 runs   unsettled 506   | D3 337; D4 share 0.5 92   | inert +50% 506
+  cluster 49    212 samples of   96 runs   unsettled 212   | D4 share 0.0 163; D1 49   | inert +50% 212
+  cluster 50    193 samples of   96 runs   unsettled 193   | D3 116; D1 77   | inert +50% 193
+  cluster 51    273 samples of   36 runs   settled 273   | D3 256; D5 17   | fresh feed -10 K 256; reactor C_A set-point -0.05 17
+  cluster 52    225 samples of   50 runs   unsettled 225   | D4 share 0.3 222; D4 share 0.7 2   | inert +50% 225
+  cluster 53    682 samples of   54 runs   unsettled 657, limit cycle 25   | D4 share 0.5 662; D4 share 0.7 20   | inert +50% 682
+  cluster 54    167 samples of   96 runs   unsettled 167   | D5 96; D4 share 0.3 71   | inert +50% 167
+  cluster 55    455 samples of   50 runs   unsettled 455   | D4 share 0.3 445; D4 share 0.7 10   | inert +50% 455
+  cluster 56    277 samples of  133 runs   unsettled 277   | D1 190; D4 share 0.0 44   | inert +50% 277
+  cluster 57    428 samples of   96 runs   unsettled 428   | D5 348; D4 share 0.0 80   | inert +50% 428
+  cluster 58    183 samples of   52 runs   unsettled 177, limit cycle 6   | D4 share 0.7 169; D4 share 0.5 14   | inert +50% 183
+  cluster 59    179 samples of   12 runs   unsettled 32, limit cycle 147   | D4 share 0.7 170; D4 share 0.5 9   | inert +50% 179
+  cluster 60    238 samples of   44 runs   unsettled 220, limit cycle 18   | D4 share 0.7 230; D4 share 0.5 8   | inert +50% 238
+  cluster 61    190 samples of   40 runs   unsettled 182, limit cycle 8   | D4 share 0.7 188; D4 share 0.5 2   | inert +50% 190
+  cluster 62    346 samples of   48 runs   settled 345, limit cycle 1   | D4 share 0.0 345; D4 share 0.7 1   | reactor C_A set-point -0.05 346
+  cluster 63    370 samples of   90 runs   settled 370   | D4 share 0.7 276; D4 share 0.3 94   | reactor C_A set-point -0.05 370
+  cluster 64    288 samples of   48 runs   settled 288   | D4 share 0.3 288   | reactor C_A set-point -0.05 288
+  cluster 65   2024 samples of  219 runs   settled 2024   | D1 1018; D5 580   | reactor C_A set-point -0.05 1916; fresh feed -10 K 108
+  cluster 66    321 samples of  105 runs   settled 320, limit cycle 1   | D4 share 0.0 178; D3 133   | reactor C_A set-point -0.05 320; inert +50% 1
+  cluster 67    972 samples of  143 runs   settled 972   | D3 580; D4 share 0.0 274   | reactor C_A set-point -0.05 972
+  cluster 68    935 samples of  125 runs   settled 935   | D4 share 0.5 588; D4 share 0.7 295   | reactor C_A set-point -0.05 935
+  cluster 69    569 samples of  141 runs   settled 569   | D4 share 0.7 261; D4 share 0.3 183   | reactor C_A set-point -0.05 569
+  cluster 70   1483 samples of   48 runs   settled 1483   | D1 1483   | throughput +10% 1483
+
+SGS against cluster 45, the largest (2540 samples, mostly settled); k = 10 as in Briceno-Mena et al. (2022); contribution, %, mean over 3 seeds of the reduction inside SGS
+  cluster 42: 2292 samples, mostly settled, mostly throughput +10%
+     Fj 27.1 (26.2-28.3)   feed T 15.4 (14.9-16.0)   reactor V 14.4 (14.2-14.7)   base level 14.0 (13.1-14.6)   tray 17 T 12.0 (11.9-12.1)
+  cluster 65: 2024 samples, mostly settled, mostly reactor C_A set-point -0.05
+     recycle 39.8 (39.8-39.8)   D 29.8 (29.8-29.8)   bottoms x_A 19.9 (19.9-19.9)   V_boil 10.0 (10.0-10.0)   Q_feed_trim 0.3 (0.3-0.3)
+  cluster 19: 1540 samples, mostly settled, mostly throughput -10%
+     L_reflux 38.3 (38.3-38.3)   V_boil 28.8 (28.8-28.9)   recycle 19.7 (19.7-19.7)   D 10.0 (10.0-10.0)   Fj 1.2 (1.2-1.3)
+  cluster 14: 1498 samples, mostly settled, mostly fresh feed -10 K
+     L_reflux 32.2 (32.1-32.2)   V_boil 23.7 (23.7-23.8)   recycle 15.3 (15.2-15.3)   feed T 9.8 (9.7-9.9)   D 7.7 (7.6-7.7)
+  cluster 0: 1494 samples, mostly settled, mostly throughput -10%
+     Fj 46.7 (46.7-46.7)   tray 17 T 16.7 (16.7-16.7)   feed T 13.3 (13.3-13.3)   L_reflux 8.0 (8.0-8.0)   V_boil 6.0 (6.0-6.0)
+  cluster 44: 1491 samples, mostly settled, mostly throughput +10%
+     Q_feed_trim 99.1 (99.1-99.1)   recycle 0.4 (0.4-0.4)   D 0.3 (0.3-0.3)   V_boil 0.2 (0.2-0.2)   bottoms x_A 0.1 (0.1-0.1)
+  cluster 8: 1490 samples, mostly settled, mostly throughput -10%
+     L_reflux 39.7 (39.7-39.7)   V_boil 29.7 (29.7-29.7)   recycle 19.8 (19.8-19.8)   D 9.9 (9.9-9.9)   feed T 0.4 (0.4-0.4)
+  cluster 1: 1488 samples, mostly settled, mostly throughput +20%
+     L_reflux 40.0 (40.0-40.0)   V_boil 30.0 (30.0-30.0)   recycle 20.0 (20.0-20.0)   D 10.0 (10.0-10.0)   reactor T 0.0 (0.0-0.0)
+  cluster 4: 1488 samples, mostly settled, mostly throughput -10%
+     L_reflux 40.0 (40.0-40.0)   V_boil 30.0 (30.0-30.0)   recycle 20.0 (20.0-20.0)   D 10.0 (10.0-10.0)   reactor T 0.0 (0.0-0.0)
+  cluster 9: 1488 samples, mostly settled, mostly throughput -10%
+     L_reflux 40.0 (40.0-40.0)   V_boil 30.0 (30.0-30.0)   recycle 20.0 (20.0-20.0)   D 10.0 (10.0-10.0)   reactor T 0.0 (0.0-0.0)
+  cluster 33: 1488 samples, mostly settled, mostly throughput -10%
+     L_reflux 40.0 (40.0-40.0)   V_boil 30.0 (30.0-30.0)   recycle 20.0 (20.0-20.0)   D 10.0 (10.0-10.0)   reactor T 0.0 (0.0-0.0)
+  cluster 70: 1483 samples, mostly settled, mostly throughput +10%
+     Q_feed_trim 100.0 (100.0-100.0)   reactor T 0.0 (0.0-0.0)   reactor C_A 0.0 (0.0-0.0)   reactor V 0.0 (0.0-0.0)   drum level 0.0 (0.0-0.0)
+  cluster 5: 1435 samples, mostly settled, mostly fresh feed -10 K
+     Q_feed_trim 50.0 (50.0-50.0)   L_reflux 33.3 (33.3-33.3)   V_boil 16.7 (16.7-16.7)   reactor T 0.0 (0.0-0.0)   reactor C_A 0.0 (0.0-0.0)
+  cluster 21: 1206 samples, mostly settled, mostly throughput +10%
+     Fj 64.6 (64.6-64.6)   Q_feed_trim 30.3 (30.3-30.3)   feed T 5.1 (5.1-5.1)   reactor T 0.0 (0.0-0.0)   reactor C_A 0.0 (0.0-0.0)
+  cluster 7: 1191 samples, mostly settled, mostly throughput +20%
+     L_reflux 38.0 (38.0-38.0)   V_boil 32.0 (32.0-32.0)   D 18.0 (18.0-18.0)   recycle 12.0 (12.0-12.0)   reactor T 0.0 (0.0-0.0)
+  cluster 37: 1140 samples, mostly settled, mostly throughput +20%
+     L_reflux 40.0 (40.0-40.0)   V_boil 30.0 (30.0-30.0)   D 20.0 (20.0-20.0)   recycle 10.0 (10.0-10.0)   reactor T 0.0 (0.0-0.0)
+  cluster 12: 1139 samples, mostly settled, mostly fresh feed -10 K
+     Q_feed_trim 50.0 (50.0-50.0)   L_reflux 33.3 (33.3-33.3)   V_boil 16.7 (16.7-16.7)   reactor T 0.0 (0.0-0.0)   reactor C_A 0.0 (0.0-0.0)
+  cluster 17: 1116 samples, mostly settled, mostly fresh feed -10 K
+     Q_feed_trim 50.0 (50.0-50.0)   L_reflux 33.3 (33.3-33.3)   V_boil 16.7 (16.7-16.7)   reactor T 0.0 (0.0-0.0)   reactor C_A 0.0 (0.0-0.0)
+  cluster 32: 1080 samples, mostly settled, mostly throughput -10%
+     L_reflux 39.8 (39.8-39.8)   V_boil 29.8 (29.8-29.8)   recycle 19.9 (19.9-19.9)   D 9.9 (9.9-9.9)   reactor T 0.4 (0.4-0.4)
+  cluster 6: 1028 samples, mostly limit cycle, mostly throughput +20%
+     feed T 25.9 (24.6-27.8)   reactor V 19.3 (18.7-19.8)   reactor T 16.6 (16.1-17.1)   reactor C_A 13.2 (12.3-13.8)   tray 17 T 10.3 (8.6-11.3)
+  cluster 67: 972 samples, mostly settled, mostly reactor C_A set-point -0.05
+     recycle 40.0 (40.0-40.0)   D 30.0 (30.0-30.0)   bottoms x_A 20.0 (20.0-20.0)   V_boil 10.0 (10.0-10.0)   reactor T 0.0 (0.0-0.0)
+  cluster 68: 935 samples, mostly settled, mostly reactor C_A set-point -0.05
+     recycle 40.0 (40.0-40.0)   D 30.0 (30.0-30.0)   bottoms x_A 20.0 (20.0-20.0)   V_boil 10.0 (10.0-10.0)   reactor T 0.0 (0.0-0.0)
+  cluster 28: 730 samples, mostly settled, mostly throughput +10%
+     Q_feed_trim 66.7 (66.7-66.7)   Fj 33.3 (33.3-33.3)   reactor T 0.0 (0.0-0.0)   reactor C_A 0.0 (0.0-0.0)   reactor V 0.0 (0.0-0.0)
+  cluster 20: 717 samples, mostly settled, mostly fresh feed -10 K
+     Q_feed_trim 50.0 (50.0-50.0)   L_reflux 33.3 (33.3-33.3)   V_boil 16.7 (16.7-16.7)   reactor T 0.0 (0.0-0.0)   reactor C_A 0.0 (0.0-0.0)
+  cluster 29: 698 samples, mostly settled, mostly throughput +10%
+     Q_feed_trim 66.7 (66.7-66.7)   Fj 33.3 (33.3-33.3)   reactor T 0.0 (0.0-0.0)   reactor C_A 0.0 (0.0-0.0)   reactor V 0.0 (0.0-0.0)
+  cluster 53: 682 samples, mostly unsettled, mostly inert +50%
+     F_fresh 50.0 (50.0-50.0)   Bm 33.3 (33.3-33.3)   bottoms x_A 16.7 (16.7-16.7)   reactor T 0.0 (0.0-0.0)   reactor C_A 0.0 (0.0-0.0)
+  cluster 38: 675 samples, mostly settled, mostly throughput +20%
+     L_reflux 34.0 (34.0-34.0)   V_boil 33.7 (33.7-33.7)   D 14.3 (14.3-14.3)   recycle 9.7 (9.7-9.7)   Fj 8.3 (8.3-8.3)
+  cluster 41: 664 samples, mostly settled, mostly throughput +20%
+     L_reflux 40.0 (40.0-40.0)   V_boil 30.0 (30.0-30.0)   D 19.0 (19.0-19.0)   recycle 11.0 (11.0-11.0)   reactor T 0.0 (0.0-0.0)
+  cluster 47: 628 samples, mostly unsettled, mostly inert +50%
+     F_fresh 50.0 (50.0-50.0)   Bm 33.3 (33.3-33.3)   bottoms x_A 16.7 (16.7-16.7)   reactor T 0.0 (0.0-0.0)   reactor C_A 0.0 (0.0-0.0)
+  cluster 34: 588 samples, mostly settled, mostly throughput +20%
+     L_reflux 40.0 (40.0-40.0)   V_boil 30.0 (30.0-30.0)   D 20.0 (20.0-20.0)   recycle 10.0 (10.0-10.0)   reactor T 0.0 (0.0-0.0)
+  cluster 69: 569 samples, mostly settled, mostly reactor C_A set-point -0.05
+     recycle 40.0 (40.0-40.0)   D 30.0 (30.0-30.0)   bottoms x_A 20.0 (20.0-20.0)   V_boil 10.0 (10.0-10.0)   reactor T 0.0 (0.0-0.0)
+  cluster 26: 549 samples, mostly settled, mostly fresh feed -10 K
+     Q_feed_trim 50.0 (50.0-50.0)   L_reflux 33.3 (33.3-33.3)   V_boil 16.7 (16.7-16.7)   reactor T 0.0 (0.0-0.0)   reactor C_A 0.0 (0.0-0.0)
+  cluster 31: 543 samples, mostly unsettled, mostly inert +50%
+     feed T 50.0 (50.0-50.0)   reactor V 25.0 (25.0-25.0)   F_fresh 12.5 (12.5-12.5)   Bm 8.3 (8.3-8.3)   bottoms x_A 4.2 (4.2-4.2)
+  cluster 3: 506 samples, mostly settled, mostly throughput +20%
+     L_reflux 40.0 (40.0-40.0)   V_boil 30.0 (30.0-30.0)   recycle 16.4 (16.4-16.5)   D 13.6 (13.5-13.6)   reactor T 0.0 (0.0-0.0)
+  cluster 48: 506 samples, mostly unsettled, mostly inert +50%
+     F_fresh 50.0 (50.0-50.0)   Bm 33.3 (33.3-33.3)   bottoms x_A 16.7 (16.7-16.7)   reactor T 0.0 (0.0-0.0)   reactor C_A 0.0 (0.0-0.0)
+  cluster 40: 505 samples, mostly settled, mostly throughput +20%
+     L_reflux 40.0 (40.0-40.0)   V_boil 30.0 (30.0-30.0)   recycle 20.0 (20.0-20.0)   D 10.0 (10.0-10.0)   reactor T 0.0 (0.0-0.0)
+  cluster 2: 460 samples, mostly settled, mostly throughput +20%
+     L_reflux 40.0 (40.0-40.0)   V_boil 30.0 (30.0-30.0)   recycle 20.0 (20.0-20.0)   D 10.0 (10.0-10.0)   reactor T 0.0 (0.0-0.0)
+  cluster 11: 460 samples, mostly settled, mostly throughput +20%
+     L_reflux 40.0 (40.0-40.0)   V_boil 30.0 (30.0-30.0)   recycle 20.0 (20.0-20.0)   D 10.0 (10.0-10.0)   reactor T 0.0 (0.0-0.0)
+  cluster 55: 455 samples, mostly unsettled, mostly inert +50%
+     F_fresh 50.0 (50.0-50.0)   Bm 33.3 (33.3-33.3)   bottoms x_A 16.7 (16.7-16.7)   reactor T 0.0 (0.0-0.0)   reactor C_A 0.0 (0.0-0.0)
+  cluster 57: 428 samples, mostly unsettled, mostly inert +50%
+     F_fresh 50.0 (50.0-50.0)   Bm 33.3 (33.3-33.3)   bottoms x_A 16.7 (16.7-16.7)   reactor T 0.0 (0.0-0.0)   reactor C_A 0.0 (0.0-0.0)
+  cluster 18: 378 samples, mostly settled, mostly throughput -10%
+     L_reflux 40.0 (40.0-40.0)   V_boil 30.0 (30.0-30.0)   recycle 20.0 (20.0-20.0)   D 10.0 (10.0-10.0)   reactor T 0.0 (0.0-0.0)
+  cluster 63: 370 samples, mostly settled, mostly reactor C_A set-point -0.05
+     recycle 40.0 (40.0-40.0)   D 30.0 (30.0-30.0)   bottoms x_A 20.0 (20.0-20.0)   V_boil 10.0 (10.0-10.0)   reactor T 0.0 (0.0-0.0)
+  cluster 24: 363 samples, mostly settled, mostly fresh feed -10 K
+     Q_feed_trim 50.0 (50.0-50.0)   L_reflux 33.3 (33.3-33.3)   V_boil 16.7 (16.7-16.7)   reactor T 0.0 (0.0-0.0)   reactor C_A 0.0 (0.0-0.0)
+  cluster 62: 346 samples, mostly settled, mostly reactor C_A set-point -0.05
+     recycle 40.0 (40.0-40.0)   D 30.0 (30.0-30.0)   bottoms x_A 10.0 (10.0-10.0)   Fj 10.0 (10.0-10.0)   V_boil 10.0 (10.0-10.0)
+  cluster 46: 344 samples, mostly unsettled, mostly inert +50%
+     F_fresh 50.0 (50.0-50.0)   Bm 33.3 (33.3-33.3)   bottoms x_A 16.7 (16.7-16.7)   reactor T 0.0 (0.0-0.0)   reactor C_A 0.0 (0.0-0.0)
+  cluster 39: 343 samples, mostly settled, mostly fresh feed -10 K
+     Q_feed_trim 50.0 (50.0-50.0)   L_reflux 33.3 (33.3-33.3)   V_boil 16.7 (16.7-16.7)   reactor T 0.0 (0.0-0.0)   reactor C_A 0.0 (0.0-0.0)
+  cluster 66: 321 samples, mostly settled, mostly reactor C_A set-point -0.05
+     reactor V 25.0 (25.0-25.0)   recycle 20.0 (20.0-20.0)   feed T 16.7 (16.7-16.7)   D 15.0 (15.0-15.0)   bottoms x_A 10.0 (10.0-10.0)
+  cluster 64: 288 samples, mostly settled, mostly reactor C_A set-point -0.05
+     recycle 40.0 (40.0-40.0)   D 30.0 (30.0-30.0)   bottoms x_A 20.0 (20.0-20.0)   V_boil 10.0 (10.0-10.0)   reactor T 0.0 (0.0-0.0)
+  cluster 56: 277 samples, mostly unsettled, mostly inert +50%
+     F_fresh 50.0 (50.0-50.0)   Bm 33.3 (33.3-33.3)   bottoms x_A 16.7 (16.7-16.7)   reactor T 0.0 (0.0-0.0)   reactor C_A 0.0 (0.0-0.0)
+  cluster 51: 273 samples, mostly settled, mostly fresh feed -10 K
+     recycle 36.4 (36.4-36.4)   D 27.3 (27.3-27.3)   bottoms x_A 18.2 (18.2-18.2)   V_boil 10.6 (10.6-10.6)   Q_feed_trim 4.5 (4.5-4.5)
+  cluster 15: 267 samples, mostly settled, mostly fresh feed -10 K
+     Q_feed_trim 50.0 (50.0-50.0)   L_reflux 33.3 (33.3-33.3)   V_boil 16.7 (16.7-16.7)   reactor T 0.0 (0.0-0.0)   reactor C_A 0.0 (0.0-0.0)
+  cluster 13: 265 samples, mostly settled, mostly fresh feed -10 K
+     Q_feed_trim 50.0 (50.0-50.0)   L_reflux 33.3 (33.3-33.3)   V_boil 16.7 (16.7-16.7)   reactor T 0.0 (0.0-0.0)   reactor C_A 0.0 (0.0-0.0)
+  cluster 35: 254 samples, mostly settled, mostly fresh feed -10 K
+     Q_feed_trim 50.0 (50.0-50.0)   L_reflux 33.3 (33.3-33.3)   V_boil 16.7 (16.7-16.7)   reactor T 0.0 (0.0-0.0)   reactor C_A 0.0 (0.0-0.0)
+  cluster 60: 238 samples, mostly unsettled, mostly inert +50%
+     F_fresh 50.0 (50.0-50.0)   Bm 33.3 (33.3-33.3)   bottoms x_A 16.7 (16.7-16.7)   reactor T 0.0 (0.0-0.0)   reactor C_A 0.0 (0.0-0.0)
+  cluster 43: 231 samples, mostly unsettled, mostly throughput +10%
+     Q_feed_trim 38.1 (33.3-40.5)   Fj 35.8 (35.7-36.1)   feed T 22.6 (21.4-25.0)   reactor T 3.4 (2.4-5.6)   reactor C_A 0.0 (0.0-0.0)
+  cluster 52: 225 samples, mostly unsettled, mostly inert +50%
+     F_fresh 50.0 (50.0-50.0)   Bm 33.3 (33.3-33.3)   bottoms x_A 16.7 (16.7-16.7)   reactor T 0.0 (0.0-0.0)   reactor C_A 0.0 (0.0-0.0)
+  cluster 16: 215 samples, mostly settled, mostly fresh feed -10 K
+     Q_feed_trim 50.0 (50.0-50.0)   L_reflux 33.3 (33.3-33.3)   V_boil 16.7 (16.7-16.7)   reactor T 0.0 (0.0-0.0)   reactor C_A 0.0 (0.0-0.0)
+  cluster 49: 212 samples, mostly unsettled, mostly inert +50%
+     F_fresh 50.0 (50.0-50.0)   Bm 33.3 (33.3-33.3)   bottoms x_A 16.7 (16.7-16.7)   reactor T 0.0 (0.0-0.0)   reactor C_A 0.0 (0.0-0.0)
+  cluster 36: 204 samples, mostly settled, mostly fresh feed -10 K
+     Q_feed_trim 50.0 (50.0-50.0)   L_reflux 33.3 (33.3-33.3)   V_boil 16.7 (16.7-16.7)   reactor T 0.0 (0.0-0.0)   reactor C_A 0.0 (0.0-0.0)
+  cluster 30: 193 samples, mostly unsettled, mostly inert +50%
+     F_fresh 50.0 (50.0-50.0)   Bm 33.3 (33.3-33.3)   bottoms x_A 16.7 (16.7-16.7)   reactor T 0.0 (0.0-0.0)   reactor C_A 0.0 (0.0-0.0)
+  cluster 50: 193 samples, mostly unsettled, mostly inert +50%
+     F_fresh 50.0 (50.0-50.0)   Bm 33.3 (33.3-33.3)   bottoms x_A 16.7 (16.7-16.7)   reactor T 0.0 (0.0-0.0)   reactor C_A 0.0 (0.0-0.0)
+  cluster 61: 190 samples, mostly unsettled, mostly inert +50%
+     F_fresh 50.0 (50.0-50.0)   Bm 33.3 (33.3-33.3)   bottoms x_A 16.7 (16.7-16.7)   reactor T 0.0 (0.0-0.0)   reactor C_A 0.0 (0.0-0.0)
+  cluster 25: 188 samples, mostly settled, mostly fresh feed -10 K
+     Q_feed_trim 50.0 (50.0-50.0)   L_reflux 33.3 (33.3-33.3)   V_boil 16.7 (16.7-16.7)   reactor T 0.0 (0.0-0.0)   reactor C_A 0.0 (0.0-0.0)
+  cluster 22: 186 samples, mostly settled, mostly fresh feed -10 K
+     Q_feed_trim 50.0 (50.0-50.0)   L_reflux 33.3 (33.3-33.3)   V_boil 16.7 (16.7-16.7)   reactor T 0.0 (0.0-0.0)   reactor C_A 0.0 (0.0-0.0)
+  cluster 27: 184 samples, mostly settled, mostly fresh feed -10 K
+     Q_feed_trim 50.0 (50.0-50.0)   L_reflux 33.3 (33.3-33.3)   V_boil 16.7 (16.7-16.7)   reactor T 0.0 (0.0-0.0)   reactor C_A 0.0 (0.0-0.0)
+  cluster 58: 183 samples, mostly unsettled, mostly inert +50%
+     F_fresh 50.0 (50.0-50.0)   Bm 33.3 (33.3-33.3)   bottoms x_A 16.7 (16.7-16.7)   reactor T 0.0 (0.0-0.0)   reactor C_A 0.0 (0.0-0.0)
+  cluster 23: 179 samples, mostly settled, mostly fresh feed -10 K
+     Q_feed_trim 50.0 (50.0-50.0)   L_reflux 33.3 (33.3-33.3)   V_boil 16.7 (16.7-16.7)   reactor T 0.0 (0.0-0.0)   reactor C_A 0.0 (0.0-0.0)
+  cluster 59: 179 samples, mostly limit cycle, mostly inert +50%
+     F_fresh 42.9 (42.2-43.3)   Bm 31.2 (30.0-32.4)   Fj 15.4 (14.7-16.7)   bottoms x_A 8.5 (7.8-8.8)   reactor T 2.0 (2.0-2.2)
+  cluster 10: 167 samples, mostly settled, mostly fresh feed -10 K
+     Q_feed_trim 50.0 (50.0-50.0)   L_reflux 33.3 (33.3-33.3)   V_boil 16.7 (16.7-16.7)   reactor T 0.0 (0.0-0.0)   reactor C_A 0.0 (0.0-0.0)
+  cluster 54: 167 samples, mostly unsettled, mostly inert +50%
+     F_fresh 50.0 (50.0-50.0)   Bm 33.3 (33.3-33.3)   bottoms x_A 16.7 (16.7-16.7)   reactor T 0.0 (0.0-0.0)   reactor C_A 0.0 (0.0-0.0)
+
+========================================================================================
+4.  LATE WINDOW, LOCAL STRUCTURE: DEVIATIONS FROM EACH RUN'S OWN LATE-WINDOW MEAN
+========================================================================================
+observations 62496 time samples x 15 variables, 31 per run over 1200-1500 min, each the mean of 5 samples; z-scored
+cleaning: dropped as round-off (spread below 1e-08 of level): L_reflux
+HDBSCAN min_cluster_size 155 (the late windows of 5 runs)
+
+  method   seed dims clusters  noise    DBI  purity ARI outcome ARI plant ARI upset
+  PCA         0    2       70  47.7%  9.215   0.989       0.148    -0.004     0.597
+  t-SNE       0    2        7  25.6%  4.867   0.881       0.051     0.008     0.001
+  t-SNE       1    2        7  25.6%  4.867   0.881       0.051     0.008     0.001
+  t-SNE       2    2        7  25.6%  4.867   0.881       0.051     0.008     0.001
+  PaCMAP      0    2       88  35.1%  3.249   0.949       0.020     0.026     0.175
+  PaCMAP      1    2      110  31.0%  1.688   0.937       0.017     0.024     0.153
+  PaCMAP      2    2       98  33.2%  1.565   0.948       0.021     0.025     0.168
+
+stability across seeds: ARI between the clusterings of two seeds
+  t-SNE    mean 1.000   min 1.000
+  PaCMAP   mean 0.279   min 0.246
+
+PaCMAP clusters (seed 0): composition by outcome, and the plants and upsets they hold
+  noise       21956 samples of 1674 runs   settled 15818, unsettled 6090, limit cycle 48   | D5 4472; D1 4109   | inert +50% 6110; throughput +20% 4592
+  cluster 0    4553 samples of  330 runs   settled 4553   | D4 share 0.5 1091; D4 share 0.7 854   | fresh feed -10 K 4553
+  cluster 1     522 samples of   58 runs   limit cycle 522   | D4 share 0.7 316; D4 share 0.5 86   | throughput +20% 379; throughput +10% 84
+  cluster 2    1607 samples of  250 runs   settled 1607   | D1 321; D3 310   | fresh feed -10 K 1607
+  cluster 3     939 samples of  135 runs   unsettled 581, limit cycle 358   | D4 share 0.7 654; D4 share 0.5 259   | throughput +10% 387; inert +50% 273
+  cluster 4     881 samples of   58 runs   limit cycle 881   | D4 share 0.7 547; D4 share 0.5 150   | throughput +20% 630; throughput +10% 145
+  cluster 5     759 samples of  203 runs   settled 759   | D4 share 0.3 191; D4 share 0.5 154   | fresh feed -10 K 759
+  cluster 6     174 samples of   96 runs   settled 174   | D5 82; D1 70   | fresh feed -10 K 173; throughput +10% 1
+  cluster 7     393 samples of  171 runs   settled 27, unsettled 341, limit cycle 25   | D4 share 0.7 163; D4 share 0.5 152   | inert +50% 360; throughput +20% 30
+  cluster 8     181 samples of   46 runs   settled 181   | D1 122; D5 51   | fresh feed -10 K 181
+  cluster 9     191 samples of  187 runs   settled 4, unsettled 187   | D3 49; D4 share 0.3 47   | inert +50% 187; throughput +20% 4
+  cluster 10    212 samples of  144 runs   settled 212   | D5 164; D1 48   | reactor C_A set-point -0.05 164; throughput +10% 48
+  cluster 11    689 samples of  243 runs   settled 689   | D5 135; D4 share 0.3 126   | fresh feed -10 K 689
+  cluster 12    449 samples of  231 runs   unsettled 443, limit cycle 6   | D3 144; D4 share 0.7 113   | inert +50% 449
+  cluster 13    334 samples of  111 runs   settled 334   | D5 190; D1 128   | fresh feed -10 K 334
+  cluster 14    320 samples of  320 runs   settled 319, unsettled 1   | D1 48; D4 share 0.5 48   | reactor C_A set-point -0.05 319; throughput +10% 1
+  cluster 15    562 samples of  280 runs   settled 559, unsettled 2, limit cycle 1   | D4 share 0.5 144; D4 share 0.3 144   | reactor C_A set-point -0.05 519; throughput +20% 41
+  cluster 16    180 samples of  132 runs   unsettled 178, limit cycle 2   | D4 share 0.5 93; D4 share 0.3 48   | inert +50% 179; fresh feed -10 K 1
+  cluster 17    776 samples of  514 runs   settled 380, unsettled 395, limit cycle 1   | D3 192; D4 share 0.7 155   | inert +50% 394; reactor C_A set-point -0.05 379
+  cluster 18    218 samples of  166 runs   unsettled 218   | D1 100; D3 48   | inert +50% 218
+  cluster 19    275 samples of   55 runs   limit cycle 275   | D4 share 0.7 173; D4 share 0.5 54   | throughput +20% 176; throughput +10% 61
+  cluster 20    237 samples of  237 runs   settled 237   | D4 share 0.5 48; D4 share 0.0 48   | throughput -10% 237
+  cluster 21    450 samples of  238 runs   settled 116, unsettled 333, limit cycle 1   | D5 166; D1 144   | inert +50% 334; reactor C_A set-point -0.05 70
+  cluster 22    314 samples of  143 runs   settled 314   | D1 88; D4 share 0.0 72   | fresh feed -10 K 314
+  cluster 23    192 samples of  191 runs   settled 192   | D5 96; D4 share 0.0 94   | reactor C_A set-point -0.05 48; throughput -10% 48
+  cluster 24    190 samples of  143 runs   settled 141, unsettled 48, limit cycle 1   | D1 93; D3 48   | throughput +20% 141; inert +50% 49
+  cluster 25   1097 samples of  499 runs   settled 1061, unsettled 35, limit cycle 1   | D1 357; D5 322   | throughput +10% 385; throughput -10% 382
+  cluster 26    587 samples of  289 runs   settled 416, unsettled 167, limit cycle 4   | D5 166; D3 145   | reactor C_A set-point -0.05 416; inert +50% 170
+  cluster 27    470 samples of  399 runs   settled 470   | D3 148; D4 share 0.3 96   | throughput +10% 229; reactor C_A set-point -0.05 209
+  cluster 28    290 samples of  145 runs   settled 289, unsettled 1   | D5 241; D4 share 0.0 48   | throughput -10% 193; throughput +10% 96
+  cluster 29    241 samples of   49 runs   settled 240, unsettled 1   | D5 240; D4 share 0.7 1   | throughput -10% 240; inert +50% 1
+  cluster 30    202 samples of  103 runs   unsettled 82, limit cycle 120   | D1 85; D4 share 0.7 80   | inert +50% 89; throughput +20% 86
+  cluster 31    296 samples of  232 runs   settled 296   | D4 share 0.5 107; D4 share 0.7 85   | throughput +10% 174; throughput -10% 109
+  cluster 32    382 samples of  175 runs   settled 382   | D1 94; D3 82   | fresh feed -10 K 382
+  cluster 33    475 samples of  414 runs   settled 475   | D4 share 0.0 142; D1 112   | throughput -10% 274; reactor C_A set-point -0.05 97
+  cluster 34    528 samples of   96 runs   settled 528   | D1 480; D5 48   | throughput -10% 480; reactor C_A set-point -0.05 48
+  cluster 35    263 samples of  196 runs   settled 263   | D1 169; D5 48   | throughput +10% 116; throughput -10% 115
+  cluster 36    419 samples of  418 runs   settled 419   | D1 191; D5 91   | throughput +10% 185; throughput -10% 97
+  cluster 37    191 samples of  191 runs   settled 191   | D4 share 0.5 48; D4 share 0.0 48   | throughput -10% 191
+  cluster 38    208 samples of  208 runs   settled 207, limit cycle 1   | D4 share 0.7 48; D4 share 0.5 48   | throughput -10% 202; throughput +20% 6
+  cluster 39    276 samples of   46 runs   settled 276   | D1 276   | throughput +20% 276
+  cluster 40   1320 samples of  202 runs   settled 12, unsettled 1036, limit cycle 272   | D4 share 0.7 494; D3 275   | inert +50% 709; throughput +10% 308
+  cluster 41    465 samples of  248 runs   settled 465   | D3 111; D4 share 0.3 88   | throughput -10% 454; fresh feed -10 K 11
+  cluster 42    234 samples of   49 runs   settled 233, limit cycle 1   | D3 233; D4 share 0.7 1   | throughput -10% 233; inert +50% 1
+  cluster 43    179 samples of  179 runs   settled 35, unsettled 144   | D4 share 0.0 48; D4 share 0.3 48   | inert +50% 144; throughput +20% 35
+  cluster 44    311 samples of  145 runs   settled 306, unsettled 5   | D3 166; D4 share 0.0 92   | throughput +20% 306; inert +50% 4
+  cluster 45    384 samples of  239 runs   settled 384   | D4 share 0.0 118; D4 share 0.3 75   | throughput -10% 384
+  cluster 46    491 samples of  109 runs   settled 482, unsettled 3, limit cycle 6   | D3 240; D4 share 0.0 230   | throughput +20% 479; reactor C_A set-point -0.05 12
+  cluster 47    192 samples of  192 runs   settled 192   | D4 share 0.5 48; D4 share 0.0 48   | throughput -10% 192
+  cluster 48    181 samples of  181 runs   settled 135, unsettled 46   | D4 share 0.5 84; D4 share 0.3 49   | reactor C_A set-point -0.05 121; inert +50% 46
+  cluster 49    333 samples of  332 runs   settled 333   | D4 share 0.0 117; D4 share 0.5 50   | reactor C_A set-point -0.05 237; throughput +10% 48
+  cluster 50    191 samples of  191 runs   settled 191   | D4 share 0.5 48; D4 share 0.0 48   | throughput -10% 191
+  cluster 51    224 samples of  224 runs   settled 224   | D4 share 0.5 81; D4 share 0.0 48   | throughput -10% 191; throughput +20% 33
+  cluster 52    194 samples of  193 runs   settled 192, unsettled 2   | D4 share 0.7 49; D4 share 0.5 48   | throughput -10% 191; throughput +10% 3
+  cluster 53    310 samples of  310 runs   settled 310   | D4 share 0.5 88; D4 share 0.3 77   | throughput +10% 181; throughput -10% 126
+  cluster 54   1441 samples of  376 runs   settled 1394, unsettled 47   | D4 share 0.3 473; D4 share 0.5 418   | reactor C_A set-point -0.05 1316; throughput +20% 78
+  cluster 55    243 samples of  217 runs   settled 241, unsettled 2   | D4 share 0.3 103; D4 share 0.5 91   | reactor C_A set-point -0.05 167; throughput +20% 74
+  cluster 56    203 samples of   96 runs   unsettled 202, limit cycle 1   | D4 share 0.3 109; D4 share 0.5 92   | inert +50% 203
+  cluster 57    635 samples of  253 runs   settled 635   | D4 share 0.7 152; D4 share 0.3 146   | throughput -10% 573; throughput +10% 50
+  cluster 58    310 samples of   49 runs   settled 310   | D4 share 0.0 310   | throughput +10% 309; throughput +20% 1
+  cluster 59    411 samples of  189 runs   settled 410, limit cycle 1   | D1 261; D3 78   | throughput +20% 276; throughput +10% 134
+  cluster 60    192 samples of  192 runs   settled 192   | D4 share 0.5 49; D4 share 0.0 48   | throughput -10% 191; fresh feed -10 K 1
+  cluster 61    190 samples of  109 runs   settled 190   | D1 165; D5 24   | throughput +10% 130; throughput +20% 60
+  cluster 62    455 samples of  208 runs   settled 455   | D1 181; D5 118   | fresh feed -10 K 261; throughput -10% 144
+  cluster 63    201 samples of  109 runs   settled 201   | D4 share 0.0 73; D5 50   | fresh feed -10 K 166; throughput -10% 35
+  cluster 64    191 samples of  191 runs   settled 191   | D4 share 0.5 48; D4 share 0.0 48   | throughput -10% 191
+  cluster 65    179 samples of  132 runs   settled 179   | D3 95; D4 share 0.3 45   | throughput +10% 179
+  cluster 66    237 samples of  192 runs   settled 237   | D3 189; D5 48   | throughput +10% 141; throughput -10% 48
+  cluster 67    208 samples of  208 runs   settled 208   | D4 share 0.5 48; D4 share 0.0 48   | throughput -10% 192; throughput +10% 16
+  cluster 68    231 samples of  231 runs   settled 231   | D3 53; D4 share 0.5 49   | reactor C_A set-point -0.05 216; throughput +20% 13
+  cluster 69    919 samples of  440 runs   settled 919   | D4 share 0.3 360; D4 share 0.5 244   | throughput +10% 595; throughput -10% 191
+  cluster 70    192 samples of  191 runs   settled 192   | D4 share 0.7 48; D4 share 0.5 48   | throughput -10% 192
+  cluster 71    855 samples of  324 runs   settled 855   | D5 309; D4 share 0.3 126   | throughput -10% 804; reactor C_A set-point -0.05 51
+  cluster 72    419 samples of   96 runs   settled 413, limit cycle 6   | D4 share 0.5 251; D4 share 0.7 123   | throughput +20% 405; reactor C_A set-point -0.05 13
+  cluster 73    211 samples of   67 runs   settled 211   | D3 210; D4 share 0.3 1   | throughput +10% 192; throughput +20% 19
+  cluster 74    549 samples of   85 runs   settled 549   | D4 share 0.0 253; D3 152   | fresh feed -10 K 549
+  cluster 75    421 samples of  156 runs   settled 421   | D4 share 0.3 349; D4 share 0.5 56   | throughput +10% 336; throughput +20% 85
+  cluster 76    405 samples of  115 runs   settled 403, unsettled 1, limit cycle 1   | D4 share 0.5 251; D4 share 0.7 154   | throughput +10% 344; throughput +20% 61
+  cluster 77    505 samples of  126 runs   settled 505   | D3 301; D4 share 0.0 202   | reactor C_A set-point -0.05 473; throughput +20% 32
+  cluster 78    223 samples of  111 runs   settled 223   | D4 share 0.5 104; D4 share 0.3 92   | throughput +10% 223
+  cluster 79    722 samples of  476 runs   settled 721, limit cycle 1   | D4 share 0.3 180; D4 share 0.5 135   | throughput +10% 388; reactor C_A set-point -0.05 302
+  cluster 80    368 samples of  368 runs   settled 368   | D1 85; D4 share 0.5 52   | throughput -10% 155; reactor C_A set-point -0.05 127
+  cluster 81    296 samples of  127 runs   settled 294, unsettled 1, limit cycle 1   | D4 share 0.7 126; D4 share 0.5 93   | throughput +20% 282; reactor C_A set-point -0.05 14
+  cluster 82    325 samples of  255 runs   settled 324, unsettled 1   | D4 share 0.0 191; D3 48   | reactor C_A set-point -0.05 130; throughput -10% 112
+  cluster 83    352 samples of  305 runs   settled 196, unsettled 153, limit cycle 3   | D4 share 0.5 127; D4 share 0.7 70   | reactor C_A set-point -0.05 169; inert +50% 156
+  cluster 84    323 samples of  269 runs   settled 323   | D4 share 0.5 92; D4 share 0.3 71   | throughput +20% 121; throughput +10% 111
+  cluster 85    477 samples of  455 runs   settled 432, unsettled 45   | D4 share 0.0 94; D3 93   | throughput -10% 191; throughput +20% 123
+  cluster 86    380 samples of  355 runs   settled 228, unsettled 152   | D4 share 0.5 86; D5 73   | throughput +10% 186; inert +50% 152
+  cluster 87    739 samples of  386 runs   settled 737, limit cycle 2   | D4 share 0.0 350; D3 144   | throughput +10% 493; throughput +20% 177
+
+SGS against cluster 0, the largest (4553 samples, mostly settled); k = 10 as in Briceno-Mena et al. (2022); contribution, %, mean over 3 seeds of the reduction inside SGS
+  cluster 2: 1607 samples, mostly settled, mostly fresh feed -10 K
+     bottoms x_A 56.0 (55.8-56.2)   Q_feed_trim 18.8 (18.7-19.0)   F_fresh 16.7 (16.5-17.1)   V_boil 5.6 (5.6-5.6)   reactor C_A 1.0 (1.0-1.0)
+  cluster 54: 1441 samples, mostly settled, mostly reactor C_A set-point -0.05
+     bottoms x_A 52.7 (52.7-52.8)   F_fresh 28.4 (28.3-28.4)   V_boil 13.0 (13.0-13.0)   reactor C_A 4.4 (4.3-4.4)   Q_feed_trim 1.5 (1.4-1.5)
+  cluster 40: 1320 samples, mostly unsettled, mostly inert +50%
+     Fj 67.7 (67.7-67.7)   feed T 19.0 (18.7-19.4)   reactor T 8.1 (7.5-8.3)   bottoms x_A 2.1 (2.1-2.2)   Q_feed_trim 2.1 (2.1-2.2)
+  cluster 25: 1097 samples, mostly settled, mostly throughput +10%
+     Q_feed_trim 30.6 (8.3-41.7)   Fj 27.8 (25.0-33.3)   feed T 16.7 (16.7-16.7)   reactor C_A 11.1 (0.0-16.7)   bottoms x_A 8.3 (0.0-25.0)
+  cluster 3: 939 samples, mostly unsettled, mostly throughput +10%
+     Fj 56.5 (54.8-58.0)   feed T 17.0 (16.1-18.8)   reactor T 7.9 (6.9-8.9)   Q_feed_trim 7.9 (6.9-8.8)   bottoms x_A 6.5 (4.4-8.9)
+  cluster 69: 919 samples, mostly settled, mostly throughput +10%
+     reactor C_A 47.5 (46.2-48.6)   bottoms x_A 36.7 (36.4-37.0)   Q_feed_trim 8.7 (8.3-9.1)   F_fresh 3.6 (3.5-3.8)   reactor T 3.4 (2.8-4.5)
+  cluster 4: 881 samples, mostly limit cycle, mostly throughput +20%
+     bottoms x_A 17.4 (16.9-18.3)   Fj 13.8 (13.0-14.6)   feed T 12.7 (12.5-13.0)   Q_feed_trim 12.7 (11.8-13.9)   F_fresh 12.3 (12.1-12.6)
+  cluster 71: 855 samples, mostly settled, mostly throughput -10%
+     reactor C_A 55.0 (54.5-55.6)   reactor T 22.5 (22.0-23.0)   Q_feed_trim 20.9 (19.8-22.0)   bottoms x_A 1.6 (1.6-1.6)   reactor V 0.0 (0.0-0.0)
+  cluster 17: 776 samples, mostly unsettled, mostly inert +50%
+     bottoms x_A 53.3 (53.3-53.3)   F_fresh 23.3 (23.3-23.3)   Fj 10.8 (10.8-10.8)   Q_feed_trim 5.8 (5.8-5.8)   V_boil 3.3 (3.3-3.3)
+  cluster 5: 759 samples, mostly settled, mostly fresh feed -10 K
+     bottoms x_A 56.1 (56.1-56.1)   F_fresh 31.3 (30.3-31.8)   V_boil 6.6 (6.1-7.6)   reactor C_A 5.1 (3.0-6.1)   Fj 1.0 (0.0-3.0)
+  cluster 87: 739 samples, mostly settled, mostly throughput +10%
+     Fj 42.2 (40.0-43.3)   reactor C_A 14.4 (6.7-20.0)   reactor T 13.3 (13.3-13.3)   Q_feed_trim 13.3 (13.3-13.3)   bottoms x_A 7.8 (6.7-10.0)
+  cluster 79: 722 samples, mostly settled, mostly throughput +10%
+     bottoms x_A 50.1 (50.1-50.1)   reactor C_A 33.3 (33.3-33.3)   F_fresh 7.4 (7.4-7.6)   Fj 4.6 (4.5-4.6)   V_boil 2.0 (1.9-2.0)
+  cluster 11: 689 samples, mostly settled, mostly fresh feed -10 K
+     Fj 44.4 (44.4-44.4)   bottoms x_A 16.7 (11.1-22.2)   Q_feed_trim 11.1 (0.0-22.2)   reactor T 11.1 (11.1-11.1)   feed T 11.1 (11.1-11.1)
+  cluster 57: 635 samples, mostly settled, mostly throughput -10%
+     Q_feed_trim 62.8 (62.7-62.8)   reactor C_A 32.7 (32.7-32.7)   bottoms x_A 2.6 (2.6-2.6)   reactor T 1.9 (1.9-2.0)   reactor V 0.0 (0.0-0.0)
+  cluster 26: 587 samples, mostly settled, mostly reactor C_A set-point -0.05
+     bottoms x_A 41.1 (41.1-41.1)   Fj 24.4 (24.4-24.4)   F_fresh 22.2 (22.2-22.2)   reactor T 6.7 (6.7-6.7)   V_boil 5.6 (5.6-5.6)
+  cluster 15: 562 samples, mostly settled, mostly reactor C_A set-point -0.05
+     bottoms x_A 24.1 (22.2-27.8)   feed T 22.2 (22.2-22.2)   Fj 16.7 (16.7-16.7)   Q_feed_trim 14.8 (11.1-22.2)   reactor T 11.1 (11.1-11.1)
+  cluster 74: 549 samples, mostly settled, mostly fresh feed -10 K
+     bottoms x_A 58.5 (57.9-59.6)   F_fresh 23.7 (23.7-23.7)   Fj 7.0 (7.0-7.0)   V_boil 5.6 (4.4-6.1)   Q_feed_trim 5.3 (5.3-5.3)
+  cluster 34: 528 samples, mostly settled, mostly throughput -10%
+     Q_feed_trim 63.7 (63.7-63.7)   reactor C_A 30.3 (30.3-30.3)   bottoms x_A 6.0 (6.0-6.0)   reactor T 0.0 (0.0-0.0)   reactor V 0.0 (0.0-0.0)
+  cluster 1: 522 samples, mostly limit cycle, mostly throughput +20%
+     Fj 26.3 (26.3-26.3)   bottoms x_A 20.2 (19.3-21.8)   reactor T 9.6 (9.2-9.8)   reactor C_A 8.1 (7.0-8.7)   Q_feed_trim 7.0 (6.7-7.7)
+  cluster 77: 505 samples, mostly settled, mostly reactor C_A set-point -0.05
+     bottoms x_A 57.2 (56.7-58.3)   F_fresh 26.1 (25.0-26.7)   reactor C_A 7.2 (6.7-8.3)   V_boil 5.8 (4.2-6.7)   Fj 3.6 (3.3-4.2)
+  cluster 46: 491 samples, mostly settled, mostly throughput +20%
+     Fj 43.3 (43.3-43.3)   bottoms x_A 40.0 (40.0-40.0)   reactor T 6.7 (6.7-6.7)   reactor C_A 5.0 (5.0-5.0)   F_fresh 3.3 (3.3-3.3)
+  cluster 85: 477 samples, mostly settled, mostly throughput -10%
+     bottoms x_A 31.5 (31.5-31.5)   reactor C_A 29.6 (29.6-29.6)   Q_feed_trim 25.9 (25.9-25.9)   F_fresh 8.6 (7.4-9.3)   Fj 2.5 (1.9-3.7)
+  cluster 33: 475 samples, mostly settled, mostly throughput -10%
+     bottoms x_A 51.9 (44.4-55.6)   Q_feed_trim 25.9 (22.2-33.3)   reactor C_A 18.5 (16.7-22.2)   Fj 3.7 (0.0-5.6)   reactor T 0.0 (0.0-0.0)
+  cluster 27: 470 samples, mostly settled, mostly throughput +10%
+     bottoms x_A 38.9 (38.9-38.9)   reactor C_A 36.1 (36.1-36.1)   F_fresh 11.1 (11.1-11.1)   reactor T 8.3 (8.3-8.3)   Fj 2.8 (2.8-2.8)
+  cluster 41: 465 samples, mostly settled, mostly throughput -10%
+     Q_feed_trim 63.7 (63.6-63.9)   reactor C_A 30.4 (30.3-30.6)   bottoms x_A 5.9 (5.6-6.1)   reactor T 0.0 (0.0-0.0)   reactor V 0.0 (0.0-0.0)
+  cluster 62: 455 samples, mostly settled, mostly fresh feed -10 K
+     Fj 50.9 (48.8-55.1)   feed T 17.1 (16.7-17.9)   reactor T 11.4 (10.7-12.8)   bottoms x_A 8.1 (5.1-9.5)   reactor C_A 6.9 (6.4-7.1)
+  cluster 21: 450 samples, mostly unsettled, mostly inert +50%
+     bottoms x_A 56.1 (56.0-56.2)   F_fresh 16.7 (16.7-16.7)   Q_feed_trim 16.5 (16.2-16.7)   reactor C_A 6.5 (6.5-6.7)   Fj 3.3 (3.2-3.3)
+  cluster 12: 449 samples, mostly unsettled, mostly inert +50%
+     bottoms x_A 53.8 (52.6-54.4)   F_fresh 26.3 (25.6-26.7)   Fj 14.0 (13.3-15.4)   reactor T 4.7 (4.4-5.1)   V_boil 1.2 (1.1-1.3)
+  cluster 75: 421 samples, mostly settled, mostly throughput +10%
+     bottoms x_A 50.6 (50.6-50.6)   reactor C_A 49.4 (49.4-49.4)   reactor T 0.0 (0.0-0.0)   reactor V 0.0 (0.0-0.0)   drum level 0.0 (0.0-0.0)
+  cluster 36: 419 samples, mostly settled, mostly throughput +10%
+     Q_feed_trim 48.7 (48.7-48.7)   reactor C_A 37.2 (37.2-37.2)   bottoms x_A 9.0 (9.0-9.0)   reactor T 5.1 (5.1-5.1)   reactor V 0.0 (0.0-0.0)
+  cluster 72: 419 samples, mostly settled, mostly throughput +20%
+     bottoms x_A 38.2 (37.5-38.9)   Fj 20.5 (18.3-22.9)   reactor C_A 12.3 (11.1-13.3)   reactor T 11.8 (11.1-12.5)   feed T 7.5 (6.7-8.3)
+  cluster 59: 411 samples, mostly settled, mostly throughput +20%
+     bottoms x_A 37.6 (37.6-37.6)   Q_feed_trim 37.2 (37.2-37.2)   reactor C_A 19.1 (19.1-19.1)   Fj 5.7 (5.7-5.7)   feed T 0.4 (0.4-0.4)
+  cluster 76: 405 samples, mostly settled, mostly throughput +10%
+     bottoms x_A 57.4 (56.4-58.3)   reactor C_A 39.2 (38.2-40.2)   Fj 1.5 (1.5-1.5)   F_fresh 1.5 (1.5-1.5)   reactor T 0.5 (0.5-0.5)
+  cluster 7: 393 samples, mostly unsettled, mostly inert +50%
+     Fj 47.6 (47.6-47.6)   bottoms x_A 21.4 (21.4-21.4)   reactor T 16.7 (16.7-16.7)   feed T 4.8 (4.8-4.8)   F_fresh 4.8 (4.8-4.8)
+  cluster 45: 384 samples, mostly settled, mostly throughput -10%
+     Q_feed_trim 50.9 (50.4-51.2)   reactor C_A 38.2 (38.1-38.2)   bottoms x_A 8.5 (8.1-9.1)   F_fresh 1.6 (1.6-1.6)   reactor T 0.8 (0.8-0.8)
+  cluster 32: 382 samples, mostly settled, mostly fresh feed -10 K
+     bottoms x_A 66.3 (66.1-66.7)   F_fresh 16.7 (14.3-17.9)   Q_feed_trim 16.7 (15.5-19.0)   V_boil 0.4 (0.0-0.6)   reactor T 0.0 (0.0-0.0)
+  cluster 86: 380 samples, mostly settled, mostly throughput +10%
+     bottoms x_A 44.9 (44.9-44.9)   reactor C_A 26.3 (26.3-26.3)   F_fresh 12.6 (12.6-12.6)   Q_feed_trim 5.6 (5.6-5.6)   Fj 4.5 (4.5-4.5)
+  cluster 80: 368 samples, mostly settled, mostly throughput -10%
+     bottoms x_A 45.6 (43.3-46.7)   Q_feed_trim 24.4 (20.0-26.7)   reactor C_A 20.0 (20.0-20.0)   F_fresh 8.9 (6.7-13.3)   V_boil 1.1 (0.0-3.3)
+  cluster 83: 352 samples, mostly settled, mostly reactor C_A set-point -0.05
+     bottoms x_A 45.8 (45.8-45.8)   F_fresh 22.9 (22.9-22.9)   feed T 8.3 (8.3-8.3)   Q_feed_trim 8.3 (8.3-8.3)   Fj 6.2 (6.2-6.2)
+  cluster 13: 334 samples, mostly settled, mostly fresh feed -10 K
+     Q_feed_trim 27.8 (16.7-33.3)   Fj 25.0 (25.0-25.0)   bottoms x_A 22.2 (16.7-33.3)   feed T 16.7 (16.7-16.7)   reactor T 8.3 (8.3-8.3)
+  cluster 49: 333 samples, mostly settled, mostly reactor C_A set-point -0.05
+     bottoms x_A 50.0 (50.0-50.0)   Q_feed_trim 13.3 (13.3-13.3)   Fj 12.2 (10.0-13.3)   reactor C_A 11.1 (10.0-13.3)   F_fresh 6.7 (6.7-6.7)
+  cluster 82: 325 samples, mostly settled, mostly reactor C_A set-point -0.05
+     bottoms x_A 25.0 (25.0-25.0)   feed T 25.0 (25.0-25.0)   Fj 16.7 (16.7-16.7)   F_fresh 16.7 (16.7-16.7)   reactor C_A 8.3 (8.3-8.3)
+  cluster 84: 323 samples, mostly settled, mostly throughput +20%
+     bottoms x_A 60.8 (60.6-61.1)   reactor C_A 22.0 (21.5-22.2)   F_fresh 9.5 (8.9-10.2)   Fj 3.8 (3.8-3.9)   Q_feed_trim 1.6 (1.6-1.7)
+  cluster 14: 320 samples, mostly settled, mostly reactor C_A set-point -0.05
+     bottoms x_A 33.3 (33.3-33.3)   Fj 25.0 (25.0-25.0)   feed T 16.7 (16.7-16.7)   F_fresh 16.7 (16.7-16.7)   V_boil 8.3 (8.3-8.3)
+  cluster 22: 314 samples, mostly settled, mostly fresh feed -10 K
+     Fj 55.6 (55.6-55.6)   reactor T 27.8 (27.8-27.8)   bottoms x_A 11.1 (11.1-11.1)   F_fresh 3.7 (0.0-5.6)   Q_feed_trim 1.9 (0.0-5.6)
+  cluster 44: 311 samples, mostly settled, mostly throughput +20%
+     bottoms x_A 49.1 (49.1-49.1)   reactor C_A 26.6 (26.6-26.8)   Q_feed_trim 12.1 (11.8-12.2)   Fj 10.4 (10.4-10.5)   feed T 0.9 (0.9-0.9)
+  cluster 53: 310 samples, mostly settled, mostly throughput +10%
+     reactor C_A 50.0 (50.0-50.0)   bottoms x_A 38.0 (38.0-38.0)   Fj 6.5 (6.5-6.5)   reactor T 2.8 (2.8-2.8)   F_fresh 1.9 (1.9-1.9)
+  cluster 58: 310 samples, mostly settled, mostly throughput +10%
+     reactor C_A 46.3 (44.4-50.0)   bottoms x_A 44.4 (41.7-47.2)   Fj 9.3 (8.3-11.1)   reactor T 0.0 (0.0-0.0)   reactor V 0.0 (0.0-0.0)
+  cluster 31: 296 samples, mostly settled, mostly throughput +10%
+     reactor C_A 61.3 (61.3-61.5)   reactor T 22.7 (22.6-22.9)   bottoms x_A 12.8 (12.5-12.9)   Q_feed_trim 2.1 (2.1-2.2)   F_fresh 1.1 (1.0-1.1)
+  cluster 81: 296 samples, mostly settled, mostly throughput +20%
+     bottoms x_A 55.1 (54.6-55.6)   F_fresh 18.8 (18.4-19.4)   reactor C_A 12.7 (12.0-13.2)   Fj 4.2 (3.7-4.6)   reactor T 3.6 (3.5-3.7)
+  cluster 28: 290 samples, mostly settled, mostly throughput -10%
+     reactor C_A 54.6 (54.5-54.6)   reactor T 26.3 (26.2-26.4)   bottoms x_A 14.2 (14.2-14.2)   Q_feed_trim 2.8 (2.8-2.8)   Fj 2.1 (2.1-2.1)
+  cluster 39: 276 samples, mostly settled, mostly throughput +20%
+     Q_feed_trim 53.0 (52.9-53.3)   bottoms x_A 38.6 (38.6-38.7)   reactor C_A 8.3 (8.1-8.6)   reactor T 0.0 (0.0-0.0)   reactor V 0.0 (0.0-0.0)
+  cluster 19: 275 samples, mostly limit cycle, mostly throughput +20%
+     feed T 39.0 (38.6-39.2)   F_fresh 18.7 (18.5-19.0)   bottoms x_A 15.2 (14.3-16.2)   reactor V 10.6 (10.5-10.7)   Q_feed_trim 8.2 (7.6-9.0)
+  cluster 35: 263 samples, mostly settled, mostly throughput +10%
+     Q_feed_trim 63.7 (63.7-63.8)   reactor C_A 32.2 (32.1-32.2)   bottoms x_A 2.9 (2.9-3.0)   F_fresh 1.2 (1.1-1.2)   reactor T 0.0 (0.0-0.0)
+  cluster 55: 243 samples, mostly settled, mostly reactor C_A set-point -0.05
+     bottoms x_A 51.4 (51.4-51.5)   F_fresh 20.5 (19.7-20.8)   reactor C_A 17.2 (16.7-18.2)   feed T 5.7 (5.6-6.1)   V_boil 5.2 (4.5-5.6)
+  cluster 29: 241 samples, mostly settled, mostly throughput -10%
+     reactor C_A 63.2 (63.2-63.3)   reactor T 32.6 (32.6-32.6)   bottoms x_A 2.7 (2.7-2.7)   Fj 1.5 (1.5-1.6)   reactor V 0.0 (0.0-0.0)
+  cluster 20: 237 samples, mostly settled, mostly throughput -10%
+     Q_feed_trim 66.7 (66.7-66.7)   reactor C_A 33.3 (33.3-33.3)   reactor T 0.0 (0.0-0.0)   reactor V 0.0 (0.0-0.0)   drum level 0.0 (0.0-0.0)
+  cluster 66: 237 samples, mostly settled, mostly throughput +10%
+     reactor C_A 40.3 (39.3-40.7)   Q_feed_trim 26.0 (25.3-27.3)   bottoms x_A 20.7 (20.0-21.0)   Fj 9.3 (9.3-9.3)   F_fresh 2.5 (2.5-2.7)
+  cluster 42: 234 samples, mostly settled, mostly throughput -10%
+     feed T 33.3 (33.3-33.3)   Q_feed_trim 33.3 (33.3-33.3)   reactor C_A 16.7 (16.7-16.7)   Fj 16.7 (16.7-16.7)   reactor T 0.0 (0.0-0.0)
+  cluster 68: 231 samples, mostly settled, mostly reactor C_A set-point -0.05
+     bottoms x_A 40.3 (40.0-40.9)   reactor C_A 19.4 (18.2-20.0)   F_fresh 17.2 (16.7-18.2)   Fj 9.7 (9.1-10.0)   V_boil 8.6 (8.3-9.1)
+  cluster 51: 224 samples, mostly settled, mostly throughput -10%
+     Q_feed_trim 61.3 (61.3-61.3)   reactor C_A 34.7 (34.7-34.7)   reactor T 2.7 (2.7-2.7)   bottoms x_A 1.3 (1.3-1.3)   reactor V 0.0 (0.0-0.0)
+  cluster 78: 223 samples, mostly settled, mostly throughput +10%
+     reactor C_A 57.8 (57.8-57.8)   bottoms x_A 42.2 (42.2-42.2)   reactor T 0.0 (0.0-0.0)   reactor V 0.0 (0.0-0.0)   drum level 0.0 (0.0-0.0)
+  cluster 18: 218 samples, mostly unsettled, mostly inert +50%
+     bottoms x_A 59.8 (59.7-60.0)   F_fresh 26.5 (26.4-26.7)   Q_feed_trim 13.7 (13.3-13.9)   reactor T 0.0 (0.0-0.0)   reactor C_A 0.0 (0.0-0.0)
+  cluster 10: 212 samples, mostly settled, mostly reactor C_A set-point -0.05
+     bottoms x_A 50.0 (50.0-50.0)   Q_feed_trim 41.7 (41.7-41.7)   reactor C_A 8.3 (8.3-8.3)   reactor T 0.0 (0.0-0.0)   reactor V 0.0 (0.0-0.0)
+  cluster 73: 211 samples, mostly settled, mostly throughput +10%
+     bottoms x_A 53.7 (50.0-55.6)   reactor C_A 37.0 (33.3-44.4)   Fj 9.3 (5.6-11.1)   reactor T 0.0 (0.0-0.0)   reactor V 0.0 (0.0-0.0)
+  cluster 38: 208 samples, mostly settled, mostly throughput -10%
+     Fj 33.3 (33.3-33.3)   Q_feed_trim 33.3 (33.3-33.3)   reactor T 16.7 (16.7-16.7)   reactor C_A 16.7 (16.7-16.7)   reactor V 0.0 (0.0-0.0)
+  cluster 67: 208 samples, mostly settled, mostly throughput -10%
+     Q_feed_trim 56.1 (55.9-56.2)   reactor C_A 37.0 (37.0-37.0)   Fj 4.4 (4.3-4.4)   reactor T 1.5 (1.4-1.5)   bottoms x_A 1.1 (1.1-1.1)
+  cluster 56: 203 samples, mostly unsettled, mostly inert +50%
+     bottoms x_A 66.7 (66.7-66.7)   F_fresh 33.3 (33.3-33.3)   reactor T 0.0 (0.0-0.0)   reactor C_A 0.0 (0.0-0.0)   reactor V 0.0 (0.0-0.0)
+  cluster 30: 202 samples, mostly limit cycle, mostly inert +50%
+     reactor T 34.3 (34.0-34.7)   feed T 28.5 (28.5-28.5)   Q_feed_trim 14.4 (13.9-14.6)   Fj 12.7 (12.5-13.2)   F_fresh 7.4 (6.9-7.6)
+  cluster 63: 201 samples, mostly settled, mostly fresh feed -10 K
+     bottoms x_A 50.0 (50.0-50.0)   reactor C_A 25.9 (25.9-25.9)   reactor T 13.0 (13.0-13.0)   Fj 7.4 (7.4-7.4)   F_fresh 2.5 (0.0-3.7)
+  cluster 52: 194 samples, mostly settled, mostly throughput -10%
+     feed T 33.3 (33.3-33.3)   Q_feed_trim 30.6 (25.0-33.3)   Fj 19.4 (16.7-25.0)   reactor C_A 16.7 (16.7-16.7)   reactor T 0.0 (0.0-0.0)
+  cluster 23: 192 samples, mostly settled, mostly reactor C_A set-point -0.05
+     Fj 33.3 (33.3-33.3)   bottoms x_A 22.2 (22.2-22.2)   reactor C_A 18.5 (16.7-22.2)   reactor T 14.8 (11.1-16.7)   Q_feed_trim 11.1 (11.1-11.1)
+  cluster 47: 192 samples, mostly settled, mostly throughput -10%
+     Q_feed_trim 62.4 (62.2-62.5)   reactor C_A 37.6 (37.5-37.8)   reactor T 0.0 (0.0-0.0)   reactor V 0.0 (0.0-0.0)   drum level 0.0 (0.0-0.0)
+  cluster 60: 192 samples, mostly settled, mostly throughput -10%
+     reactor C_A 59.0 (59.0-59.0)   Q_feed_trim 31.9 (31.9-31.9)   bottoms x_A 4.9 (4.9-4.9)   Fj 2.8 (2.8-2.8)   reactor T 1.4 (1.4-1.4)
+  cluster 70: 192 samples, mostly settled, mostly throughput -10%
+     Q_feed_trim 66.7 (66.7-66.7)   reactor C_A 33.3 (33.3-33.3)   reactor T 0.0 (0.0-0.0)   reactor V 0.0 (0.0-0.0)   drum level 0.0 (0.0-0.0)
+  cluster 9: 191 samples, mostly unsettled, mostly inert +50%
+     bottoms x_A 60.4 (60.4-60.4)   F_fresh 33.3 (33.3-33.3)   V_boil 6.2 (6.2-6.2)   reactor T 0.0 (0.0-0.0)   reactor C_A 0.0 (0.0-0.0)
+  cluster 37: 191 samples, mostly settled, mostly throughput -10%
+     Q_feed_trim 66.7 (66.7-66.7)   reactor C_A 33.3 (33.3-33.3)   reactor T 0.0 (0.0-0.0)   reactor V 0.0 (0.0-0.0)   drum level 0.0 (0.0-0.0)
+  cluster 50: 191 samples, mostly settled, mostly throughput -10%
+     Q_feed_trim 66.7 (66.7-66.7)   reactor C_A 33.3 (33.3-33.3)   reactor T 0.0 (0.0-0.0)   reactor V 0.0 (0.0-0.0)   drum level 0.0 (0.0-0.0)
+  cluster 64: 191 samples, mostly settled, mostly throughput -10%
+     Q_feed_trim 54.8 (54.5-55.1)   reactor C_A 30.5 (30.3-30.7)   bottoms x_A 14.8 (14.5-15.2)   reactor T 0.0 (0.0-0.0)   reactor V 0.0 (0.0-0.0)
+  cluster 24: 190 samples, mostly settled, mostly throughput +20%
+     bottoms x_A 41.7 (41.7-41.7)   Q_feed_trim 37.5 (37.5-37.5)   reactor C_A 8.3 (8.3-8.3)   F_fresh 8.3 (8.3-8.3)   Fj 2.1 (2.1-2.1)
+  cluster 61: 190 samples, mostly settled, mostly throughput +10%
+     Q_feed_trim 53.4 (53.3-53.6)   reactor C_A 31.1 (31.0-31.1)   bottoms x_A 15.2 (14.4-15.6)   Fj 0.4 (0.0-1.1)   reactor T 0.0 (0.0-0.0)
+  cluster 8: 181 samples, mostly settled, mostly fresh feed -10 K
+     bottoms x_A 58.9 (56.7-60.0)   F_fresh 21.1 (20.0-23.3)   Q_feed_trim 13.3 (13.3-13.3)   Fj 6.7 (6.7-6.7)   reactor T 0.0 (0.0-0.0)
+  cluster 48: 181 samples, mostly settled, mostly reactor C_A set-point -0.05
+     bottoms x_A 50.0 (50.0-50.0)   F_fresh 22.9 (22.9-22.9)   Q_feed_trim 14.6 (14.6-14.6)   reactor C_A 6.2 (6.2-6.2)   V_boil 6.2 (6.2-6.2)
+  cluster 16: 180 samples, mostly unsettled, mostly inert +50%
+     bottoms x_A 63.0 (62.9-63.3)   F_fresh 28.8 (28.6-29.2)   Q_feed_trim 4.1 (3.8-4.3)   base level 2.7 (2.5-2.9)   drum level 1.4 (1.3-1.4)
+  cluster 43: 179 samples, mostly unsettled, mostly inert +50%
+     bottoms x_A 66.7 (66.7-66.7)   F_fresh 21.8 (20.8-22.2)   reactor C_A 11.6 (11.1-12.5)   reactor T 0.0 (0.0-0.0)   reactor V 0.0 (0.0-0.0)
+  cluster 65: 179 samples, mostly settled, mostly throughput +10%
+     reactor C_A 48.3 (48.3-48.3)   bottoms x_A 33.8 (33.8-33.8)   Fj 17.5 (17.5-17.5)   reactor T 0.4 (0.4-0.4)   reactor V 0.0 (0.0-0.0)
+  cluster 6: 174 samples, mostly settled, mostly fresh feed -10 K
+     Fj 33.3 (33.3-33.3)   Q_feed_trim 31.9 (29.2-37.5)   feed T 16.7 (16.7-16.7)   bottoms x_A 13.9 (8.3-16.7)   reactor C_A 4.2 (4.2-4.2)
+
+========================================================================================
+5.  EARLY WINDOW: DOES IT PREDICT THE LATE OUTCOME?
+========================================================================================
+task: target regimes.outcome, window 0-130 min, 5 folds stratified, seed 0; pb-protocol:dab0d47475e9
+observations 2016 runs x 176 features: the 16 variables over 30-130 min, sampled every 10 min as 8 min means, z-scored
+cleaning: variables with windows dropped as round-off: none
+classifier: 10-nearest neighbors, on the task's folds
+HDBSCAN min_cluster_size 10
+
+  PCA      dims  10   clusters  24   noise 11.9%   DBI  2.197   ARI outcome 0.064   purity 0.975
+           in the embedding: balanced accuracy 0.853   limit cycles found 52 of 82, false alarms 2
+  t-SNE    dims   2   clusters  27   noise  3.4%   DBI  0.664   ARI outcome 0.070   purity 0.965
+           in the embedding: balanced accuracy 0.867   limit cycles found 56 of 82, false alarms 6
+  PaCMAP   dims   2   clusters  40   noise  6.2%   DBI  1.682   ARI outcome 0.074   purity 0.968
+           in the embedding: balanced accuracy 0.916   limit cycles found 68 of 82, false alarms 8
+
+baselines on the same folds
+  all 176 early features, no reduction:  balanced accuracy 0.837   limit cycles found 48 of 82, false alarms 3
+  damping ratio and rightmost eigenvalue:   balanced accuracy 0.439   limit cycles found 25 of 82, false alarms 11
+  majority outcome of the plant and upset:  balanced accuracy 0.760   limit cycles found 30 of 82, false alarms 18
+  early features with the two eigenvalue features: balanced accuracy 0.853   limit cycles found 52 of 82, false alarms 3
+  always 'settled':                         balanced accuracy 0.333   limit cycles found 0 of 82, false alarms 0
+
+========================================================================================
+6.  THE EARLY-WINDOW ANSWER UNDER STRICTER READINGS
+========================================================================================
+grouped folds: 5 folds stratified on the outcome, each holding out whole plant-and-upset combinations (9, 9, 8, 8, 8 of 42), seed 0
+design variables: plant and upset one-hot, Kc, tau_I and deadtime z-scored, 16 features
+classifiers: 10-nearest neighbors, and a random forest of 500 trees with balanced class weights, seed 0
+
+on the task folds
+  all 176 early features, no reduction:  balanced accuracy 0.837   limit cycles found 48 of 82, false alarms 3
+  design variables:                         balanced accuracy 0.774   limit cycles found 35 of 82, false alarms 5
+  early features with the design variables: balanced accuracy 0.821   limit cycles found 44 of 82, false alarms 2
+  damping ratio and rightmost eigenvalue:   balanced accuracy 0.439   limit cycles found 25 of 82, false alarms 11
+  forest, all early features:               balanced accuracy 0.949   limit cycles found 73 of 82, false alarms 5
+  forest, design variables:                 balanced accuracy 0.888   limit cycles found 59 of 82, false alarms 15
+  majority outcome of the plant and upset:  balanced accuracy 0.760   limit cycles found 30 of 82, false alarms 18
+on the grouped folds
+  all 176 early features, no reduction:  balanced accuracy 0.754   limit cycles found 28 of 82, false alarms 0
+  design variables:                         balanced accuracy 0.548   limit cycles found 11 of 82, false alarms 11
+  early features with the design variables: balanced accuracy 0.746   limit cycles found 26 of 82, false alarms 0
+  damping ratio and rightmost eigenvalue:   balanced accuracy 0.428   limit cycles found 24 of 82, false alarms 20
+  forest, all early features:               balanced accuracy 0.884   limit cycles found 60 of 82, false alarms 5
+  forest, design variables:                 balanced accuracy 0.694   limit cycles found 14 of 82, false alarms 15
+
+the damping ratio at the recall of the early classifier (threshold read on all runs, which favors the damping ratio)
+  task folds    10-NN : early window finds 48 of 82 with 3 false alarms; damping <= 0.0485 finds 48 with 77
+  task folds    forest: early window finds 73 of 82 with 5 false alarms; damping <= 0.1501 finds 73 with 814
+  grouped folds 10-NN : early window finds 28 of 82 with 0 false alarms; damping <= 0.0197 finds 28 with 17
+  grouped folds forest: early window finds 60 of 82 with 5 false alarms; damping <= 0.0744 finds 60 with 173

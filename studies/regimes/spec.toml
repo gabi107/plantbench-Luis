@@ -1,0 +1,62 @@
+# The regimes dataset: 42 combinations x 48 = 2016 runs.  The pilot (pilot.toml, 210 runs)
+# gave 79% settled, 18% unsettled and 4% limit cycles at a median of 3.2, 1.9 and 90 s a
+# run; 48 points per combination puts about 80 limit cycles in the dataset.
+
+[study]
+name = "regimes"
+case = "reactor_separator_recycle"
+seed = 20260918
+
+[base]
+structure = "effluent fixed + cascade"
+instruments = {"reactor C_A" = {order = 2}}
+
+# Every combination of a heat-integrated plant and an upset.  D4 appears at four
+# pump-around shares, the trade between heat recovery and jacket authority.
+[variants]
+plant = [
+    {options = {network = "D1"}},
+    {options = {network = "D3"}},
+    {options = {network = "D5"}},
+    {options = {network = "D4", pump_around_share = 0.0}},
+    {options = {network = "D4", pump_around_share = 0.3}},
+    {options = {network = "D4", pump_around_share = 0.5}},
+    {options = {network = "D4", pump_around_share = 0.7}},
+]
+upset = [
+    {disturbance = {name = "throughput", fraction = 0.10, t = 30.0}},
+    {disturbance = {name = "throughput", fraction = 0.20, t = 30.0}},
+    {disturbance = {name = "throughput", fraction = -0.10, t = 30.0}},
+    {disturbance = {name = "inert", fraction = 0.5, t = 30.0}},
+    {disturbance = {name = "fresh_feed_temperature", change = -10.0, t = 30.0}},
+    {setpoint_steps = {"reactor C_A" = [[30.0, -0.05]]}},
+]
+
+# For every combination, a Latin hypercube over the reactor temperature tuning and the
+# deadtime of the analyzer on the composition loop (second-order Pade).
+[sample]
+n = 48
+"tuning.reactor T.Kc" = [-2.0, -0.5]
+"tuning.reactor T.tau_I" = [5.0, 40.0]
+"instruments.reactor C_A.deadtime" = [0.0, 10.0]
+
+[run]
+t_end = 1500.0
+dt = 2.0
+wall_budget = 600.0
+features = ["spectrum"]
+states = false
+
+# Question (ii) of the analysis, stated as a protocol: the sixteen signals of each run over
+# its first 130 min (the design point, the upset at 30 min and the 100 min after it), the
+# outcome of labels.py as the label, five stratified folds, and what is reported.  The
+# task leaves the runs, and so the digest of the dataset, as they were.
+[task]
+target = "regimes.outcome"
+signals = ["reactor T", "reactor C_A", "reactor V", "drum level", "base level",
+           "bottoms x_A", "tray 17 T", "recycle", "feed T",
+           "Fj", "F_fresh", "V_boil", "L_reflux", "D", "Bm", "Q_feed_trim"]
+window = [0.0, 130.0]
+split = {folds = 5, stratified = true, seed = 0}
+metrics = ["balanced_accuracy", "found", "false_alarms"]
+positive = "limit cycle"

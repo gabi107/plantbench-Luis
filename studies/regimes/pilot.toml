@@ -1,0 +1,46 @@
+# Pilot: 42 combinations x 5 = 210 runs, to measure the outcome mix and the cost.
+
+[study]
+name = "regimes-pilot"
+case = "reactor_separator_recycle"
+seed = 20260918
+
+[base]
+structure = "effluent fixed + cascade"
+instruments = {"reactor C_A" = {order = 2}}
+
+# Every combination of a heat-integrated plant and an upset.  D4 appears at four
+# pump-around shares, the trade between heat recovery and jacket authority.
+[variants]
+plant = [
+    {options = {network = "D1"}},
+    {options = {network = "D3"}},
+    {options = {network = "D5"}},
+    {options = {network = "D4", pump_around_share = 0.0}},
+    {options = {network = "D4", pump_around_share = 0.3}},
+    {options = {network = "D4", pump_around_share = 0.5}},
+    {options = {network = "D4", pump_around_share = 0.7}},
+]
+upset = [
+    {disturbance = {name = "throughput", fraction = 0.10, t = 30.0}},
+    {disturbance = {name = "throughput", fraction = 0.20, t = 30.0}},
+    {disturbance = {name = "throughput", fraction = -0.10, t = 30.0}},
+    {disturbance = {name = "inert", fraction = 0.5, t = 30.0}},
+    {disturbance = {name = "fresh_feed_temperature", change = -10.0, t = 30.0}},
+    {setpoint_steps = {"reactor C_A" = [[30.0, -0.05]]}},
+]
+
+# For every combination, a Latin hypercube over the reactor temperature tuning and the
+# deadtime of the analyzer on the composition loop (second-order Pade).
+[sample]
+n = 5
+"tuning.reactor T.Kc" = [-2.0, -0.5]
+"tuning.reactor T.tau_I" = [5.0, 40.0]
+"instruments.reactor C_A.deadtime" = [0.0, 10.0]
+
+[run]
+t_end = 1500.0
+dt = 2.0
+wall_budget = 600.0
+features = ["spectrum"]
+states = false

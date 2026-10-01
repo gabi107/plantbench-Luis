@@ -1,0 +1,47 @@
+The damping ratio of reactor_separator_recycle against the analyzer deadtime, and its Sobol' indices
+dataset data/design-sobol, no specification, 1792 runs, generated at no commit
+analyzed at 6fc4e69 clean with plantbench 0.1.0, Python 3.14.7, NumPy 2.5.3, SciPy 1.18.1, scikit-learn 1.9.1, pacmap 0.9.1, hdbscan 0.8.44
+
+========================================================================================
+1.  THE DAMPING RATIO WHEN THE ANALYZER IS NOT IDEAL
+========================================================================================
+The analytical method priced operability by the least damping ratio of the closed loop
+linearized at the design point, holding every measurement ideal.  The linearization carries
+whatever instrument the configuration names, so the same criterion can be read with the
+composition analyzer in place.
+
+  plant                0 min     1 min     2 min     3 min     5 min     7 min    10 min   closed-loop states
+  D4 share 0          0.1590    0.1438    0.1789    0.2196    0.2115    0.1920    0.1790   144 to 146
+  D4 share 0.3        0.0874    0.0839    0.1525    0.2794    0.2440    0.1848    0.1475   145 to 147
+  D4 share 0.5        0.0476    0.0484    0.1280    0.3427    0.1915    0.1386    0.1046   145 to 147
+  D4 share 0.7        0.0125    0.0163    0.1002    0.2863    0.1440    0.0972    0.0664   145 to 147
+  D3                  0.1569    0.1428    0.1803    0.2228    0.2100    0.1881    0.1746   143 to 145
+  (the rightmost eigenvalue moves from -0.002850 to -0.002821 1/min over the whole sweep, so
+   what the deadtime changes is damping rather than stability)
+
+========================================================================================
+2.  SENSITIVITY OVER THE DESIGN VARIABLES
+========================================================================================
+Sobol' indices over the vacuum family's box, n = 256, so 1792 evaluations of each
+output.  The upset is held at throughput +10%, so that the sample varies the design and not what it is
+asked to reject.
+
+(a) the damping ratio at the design point, the analytical method's criterion;
+the analyzer deadtime enters the linearization as its second-order Pade approximation (section 1)
+  design variable               first order    total    95% bootstrap intervals (1000 resamples), first; total
+  reactor T loop Kc                   0.305    0.599    [0.012, 0.635]; [0.467, 0.760]
+  analyzer deadtime, min              0.199    0.480    [-0.098, 0.523]; [0.382, 0.596]
+  pump-around share                   0.179    0.244    [0.001, 0.362]; [0.194, 0.305]
+  reactor T loop tau_I, min           0.027    0.025    [-0.027, 0.075]; [0.015, 0.037]
+  column pressure, bar                0.003    0.000    [-0.005, 0.011]; [0.000, 0.001]
+
+(b) the realized outcome, as the indicator that a run does not hold an operating point
+  1792 configurations written to sobol-outcome.json.  Run them with:
+    python -m studies.design.verify --workers 8
+  data/design-sobol: 1792 runs, 8.10 h of integration, median 4.0 s, max 335 s
+  design variable               first order    total    95% bootstrap intervals (1000 resamples), first; total
+  analyzer deadtime, min              0.203    0.736    [0.042, 0.408]; [0.519, 1.046]
+  pump-around share                   0.051    0.584    [0.000, 0.159]; [0.373, 0.842]
+  reactor T loop Kc                   0.102    0.330    [0.000, 0.259]; [0.163, 0.536]
+  reactor T loop tau_I, min           0.102    0.305    [0.000, 0.244]; [0.158, 0.504]
+  column pressure, bar                0.000    0.000    [0.000, 0.000]; [0.000, 0.000]

@@ -1,0 +1,268 @@
+
+========================================================================================
+ASSUMED DATA
+========================================================================================
+normal boiling points  inert 337.2 K   reactant 359.0 K   product 400.0 K
+molar mass 267.9 kg/kmol   liquid heat capacity 1044.6 kJ/(kmol K)
+fresh feed delivered at 300 K; products stored at 320 K; dT_min 10 K
+prices  product $1.10/kg   feed $0.95/kg   electricity $0.080/kWh   gas $4.00/GJ
+GWP     feed burden 2.0 kg/kg   gas 56.1 kg/GJ fuel   boiler efficiency 0.85   grid 0.40 kg/kWh   chiller COP 4.0
+   LP steam         417 K   $ 5.71/GJ    66.00 kg CO2e/GJ
+   MP steam         457 K   $ 6.21/GJ    66.00 kg CO2e/GJ
+   HP steam         523 K   $ 7.21/GJ    66.00 kg CO2e/GJ
+   cooling water    308 K   $ 0.35/GJ     0.16 kg CO2e/GJ
+   chilled water    283 K   $ 5.99/GJ    27.98 kg CO2e/GJ
+reactor liquid bubble pressure at 362.4 K: 0.87 bar
+
+========================================================================================
+TEMPERATURE LEVELS AGAINST COLUMN PRESSURE (design operating point)
+========================================================================================
+ P bar  bottoms    drum     dew  col feed     mix   reactor 362.40 K, inlet 336.97 K
+  0.15    333.7   300.9   303.3     310.9   300.5
+  0.20    342.3   307.8   310.3     318.3   304.0
+  0.25    349.2   313.4   316.0     324.3   306.9
+  0.30    355.1   318.1   320.8     329.4   309.3
+  0.40    364.8   325.9   328.7     337.7   313.3
+  0.50    372.6   332.2   335.1     344.4   316.6
+  0.60    379.3   337.5   340.5     350.1   319.3
+  0.80    390.4   346.2   349.4     359.5   323.8
+  1.00    399.5   353.3   356.6     367.2   327.5
+  1.50    417.0   367.0   370.5     382.0   334.5
+  2.00    430.4   377.3   381.1     393.2   339.8
+
+column sensible heat, supplied by the reboiler beyond lambda*V (GJ/h): 0.15 bar 6.15, 0.4 bar 7.36, 0.8 bar 8.45, 1.0 bar 8.85
+
+========================================================================================
+STREAM TABLE AT 0.4 bar (D3)
+========================================================================================
+   reactor feed       cold   313.3 ->   337.0 K     26.5 GJ/h
+   reactor effluent   hot    362.4 ->   337.7 K     27.8 GJ/h
+   reactor heat       hot    362.5 ->   362.4 K     14.1 GJ/h
+   condenser          hot    328.7 ->   325.9 K     53.8 GJ/h
+   reboiler           cold   364.7 ->   364.8 K     61.1 GJ/h
+   bottoms product    hot    364.8 ->   320.0 K     23.7 GJ/h
+   purge              hot    325.9 ->   320.0 K      0.1 GJ/h
+   pinch (hot side) 374.72 K   QH_min 61.1 GJ/h   QC_min 92.9 GJ/h
+
+========================================================================================
+STREAM TABLE AT 0.15 bar (D4)
+========================================================================================
+   reactor feed       cold   300.5 ->   337.0 K     41.0 GJ/h
+   reactor effluent   hot    362.4 ->   310.9 K     57.8 GJ/h
+   reactor heat       hot    362.5 ->   362.4 K     14.1 GJ/h
+   condenser          hot    303.3 ->   300.9 K     53.8 GJ/h
+   reboiler           cold   333.7 ->   333.8 K     59.9 GJ/h
+   bottoms product    hot    333.7 ->   320.0 K      7.3 GJ/h
+   pinch (hot side) 343.69 K   QH_min 28.5 GJ/h   QC_min 60.5 GJ/h
+
+========================================================================================
+UTILITY TARGETS AGAINST COLUMN PRESSURE: D1 no integration, D2 pinch target
+========================================================================================
+    P |  D1 $/h  D1 t/h |  D2 $/h  D2 t/h steam GJ/h     CW    ChW | GWP saving
+ 0.15 |     971   8.398 |     487   3.387       28.5    6.8   53.8 |       60%
+ 0.20 |     903   7.933 |     525   3.799       34.7   12.9   53.8 |       52%
+ 0.25 |     885   7.737 |     574   4.332       42.8   20.9   53.8 |       44%
+ 0.30 |     567   6.076 |     379   4.023       60.7   92.5    0.0 |       34%
+ 0.40 |     542   5.805 |     381   4.049       61.1   92.9    0.0 |       30%
+ 0.50 |     522   5.587 |     383   4.071       61.4   93.2    0.0 |       27%
+ 0.60 |     505   5.402 |     385   4.089       61.7   93.5    0.0 |       24%
+ 0.80 |     477   5.099 |     388   4.121       62.2   94.0    0.0 |       19%
+ 1.00 |     488   5.211 |     390   4.148       62.6   94.4    0.0 |       20%
+ 1.50 |     577   5.840 |     427   4.201       63.4   95.2    0.0 |       28%
+ 2.00 |     641   6.532 |     431   4.243       64.1   95.8    0.0 |       35%
+
+========================================================================================
+DESIGNS AT THE DESIGN OPERATING POINT
+========================================================================================
+production 135.89 t/h; feed burden 279.3 t CO2e/h, the same for every design
+
+D1  no heat integration, column at 0.8 bar, 0 exchanger(s)
+   utilities (GJ/h): LP steam 77.0, cooling water 108.7
+   profit $16,329/h   utilities $477/h   energy GWP 5.099 t/h   | pinch target at 0.8 bar: $388/h, 4.121 t/h
+
+D3  feed-effluent exchanger, column at 0.4 bar, 1 exchanger(s)
+   reactor effluent  -> reactor feed    26.5 GJ/h  UA    17,397 kJ/(min K)  hot 362.4 -> 338.8  cold 313.3 -> 337.0
+   utilities (GJ/h): LP steam 61.1, cooling water 92.9
+   profit $16,425/h   utilities $381/h   energy GWP 4.049 t/h   | pinch target at 0.4 bar: $381/h, 4.049 t/h
+
+D4  vacuum column, reactor heat to reboiler, column at 0.15 bar, 3 exchanger(s)
+   reactor effluent  -> reboiler        21.0 GJ/h  UA    19,756 kJ/(min K)  hot 362.4 -> 343.7  cold 333.7 -> 333.7
+   reactor heat      -> reboiler         9.9 GJ/h  UA     5,725 kJ/(min K)  hot 362.5 -> 362.4  cold 333.7 -> 333.7
+   reactor effluent  -> reactor feed    36.8 GJ/h  UA    58,660 kJ/(min K)  hot 343.7 -> 310.9  cold 300.5 -> 333.2
+   utilities (GJ/h): LP steam 33.2, cooling water 11.5, chilled water 53.8
+   profit $16,291/h   utilities $516/h   energy GWP 3.700 t/h   | pinch target at 0.15 bar: $487/h, 3.387 t/h
+
+D5  condenser heat to reactor feed, column at 0.8 bar, 1 exchanger(s)
+   condenser         -> reactor feed    14.8 GJ/h  UA    13,792 kJ/(min K)  hot 349.4 -> 348.5  cold 323.8 -> 337.0
+   utilities (GJ/h): LP steam 62.2, cooling water 94.0
+   profit $16,419/h   utilities $388/h   energy GWP 4.121 t/h   | pinch target at 0.8 bar: $388/h, 4.121 t/h
+
+D4 against D3: +135 $/h of profit given up for +0.349 t CO2e/h avoided, 386 $/t
+
+========================================================================================
+PARETO EVALUATION ACROSS THROUGHPUT (effluent fixed + cascade; effluent flow moved)
+========================================================================================
+   effluent -20%: production 6.991 kmol/min (-17.3%), recycle 7.111, reactor 359.98 K, settling drift 3.2e-06
+   effluent -15%: production 7.367 kmol/min (-12.9%), recycle 7.630, reactor 360.64 K, settling drift 2.8e-06
+   effluent -10%: production 7.737 kmol/min (-8.5%), recycle 8.157, reactor 361.27 K, settling drift 2.1e-06
+   effluent -5%: production 8.100 kmol/min (-4.2%), recycle 8.690, reactor 361.85 K, settling drift 1.1e-06
+   effluent +0%: production 8.455 kmol/min (+0.0%), recycle 9.230, reactor 362.40 K, settling drift 0.0e+00
+   effluent +5%: production 8.804 kmol/min (+4.1%), recycle 9.778, reactor 362.92 K, settling drift 1.3e-06
+   effluent +10%: production 9.146 kmol/min (+8.2%), recycle 10.332, reactor 363.41 K, settling drift 2.9e-06
+   effluent +15%: production 9.481 kmol/min (+12.1%), recycle 10.893, reactor 363.88 K, settling drift 4.6e-06
+   effluent +20%: production 9.809 kmol/min (+16.0%), recycle 11.460, reactor 364.32 K, settling drift 6.5e-06
+   effluent +25%: production 10.131 kmol/min (+19.8%), recycle 12.035, reactor 364.73 K, settling drift 8.5e-06
+
+design   thru     P  profit $/h utilities GWP_E t/h  feed t/h
+D1       -20%  0.80      12,890       386     4.120     232.2
+D3       -20%  0.40      12,960       316     3.357     232.2
+D4       -20%  0.15      12,859       417     3.020     232.2
+D5       -20%  0.80      12,964       312     3.313     232.2
+D1       -15%  0.80      13,779       405     4.321     244.3
+D3       -15%  0.40      13,853       331     3.514     244.3
+D4       -15%  0.15      13,742       442     3.192     244.3
+D5       -15%  0.80      13,857       327     3.471     244.3
+D1       -10%  0.80      14,646       429     4.580     256.2
+D3       -10%  0.40      14,729       345     3.668     256.2
+D4       -10%  0.15      14,608       467     3.362     256.2
+D5       -10%  0.80      14,728       347     3.686     256.2
+D1        -5%  0.80      15,496       453     4.839     267.9
+D3        -5%  0.40      15,588       361     3.835     267.9
+D4        -5%  0.15      15,458       491     3.531     267.9
+D5        -5%  0.80      15,582       367     3.903     267.9
+D1        +0%  0.80      16,329       477     5.099     279.3
+D3        +0%  0.40      16,425       381     4.049     279.3
+D4        +0%  0.15      16,291       516     3.700     279.3
+D5        +0%  0.80      16,419       388     4.121     279.3
+D1        +5%  0.80      17,146       502     5.360     290.5
+D3        +5%  0.40      17,244       404     4.291     290.5
+D4        +5%  0.15      17,094       553     3.977     290.5
+D5        +5%  0.80      17,235       412     4.378     290.5
+D1       +10%  0.80      17,946       526     5.620     301.5
+D3       +10%  0.40      18,045       427     4.536     301.5
+D4       +10%  0.15      17,880       592     4.263     301.5
+D5       +10%  0.80      18,036       436     4.637     301.5
+D1       +15%  0.80      18,729       550     5.881     312.3
+D3       +15%  0.40      18,830       450     4.783     312.3
+D4       +15%  0.15      18,648       631     4.558     312.3
+D5       +15%  0.80      18,819       460     4.898     312.3
+D1       +20%  0.80      19,496       575     6.143     322.8
+D3       +20%  0.40      19,598       473     5.034     322.8
+D4       +20%  0.15      19,399       672     4.861     322.8
+D5       +20%  0.80      19,586       485     5.159     322.8
+D1       +25%  0.80      20,247       599     6.404     333.2
+D3       +25%  0.40      20,349       497     5.287     333.2
+D4       +25%  0.15      20,132       713     5.174     333.2
+D5       +25%  0.80      20,337       509     5.422     333.2
+
+D2 (pinch target over all pressures), non-dominated points:
+   -20% at 0.15 bar: profit 12,899  GWP 2.583
+   -15% at 0.15 bar: profit 13,780  GWP 2.778
+   -10% at 0.15 bar: profit 14,643  GWP 2.977
+   -5% at 0.15 bar: profit 15,490  GWP 3.180
+   +0% at 0.15 bar: profit 16,319  GWP 3.387
+   +5% at 0.15 bar: profit 17,132  GWP 3.597
+   +10% at 0.15 bar: profit 17,927  GWP 3.810
+   +15% at 0.15 bar: profit 18,706  GWP 4.028
+   +20% at 0.15 bar: profit 19,466  GWP 4.255
+   +25% at 0.15 bar: profit 20,210  GWP 4.485
+   +25% at 0.4 bar: profit 20,363  GWP 5.132
+
+practical designs, non-dominated points:
+   D4 -20%: profit 12,859  GWP 3.020
+   D4 -15%: profit 13,742  GWP 3.192
+   D4 -10%: profit 14,608  GWP 3.362
+   D4 -5%: profit 15,458  GWP 3.531
+   D4 +0%: profit 16,291  GWP 3.700
+   D4 +5%: profit 17,094  GWP 3.977
+   D3 +10%: profit 18,045  GWP 4.536
+   D4 +10%: profit 17,880  GWP 4.263
+   D3 +15%: profit 18,830  GWP 4.783
+   D4 +15%: profit 18,648  GWP 4.558
+   D3 +20%: profit 19,598  GWP 5.034
+   D4 +20%: profit 19,399  GWP 4.861
+   D3 +25%: profit 20,349  GWP 5.287
+   D4 +25%: profit 20,132  GWP 5.174
+
+========================================================================================
+GRID CARBON INTENSITY: D4 AGAINST D3 AT DESIGN THROUGHPUT
+========================================================================================
+   grid 0.1 kg/kWh: D3 4.038 t/h, D4 2.570 t/h, D4 gives up 135 $/h for +1.467 t/h  -> 92 $/t
+   grid 0.4 kg/kWh: D3 4.049 t/h, D4 3.700 t/h, D4 gives up 135 $/h for +0.349 t/h  -> 386 $/t
+   grid 0.8 kg/kWh: D3 4.064 t/h, D4 5.206 t/h, D4 gives up 135 $/h for -1.142 t/h  -> D4 emits more
+
+========================================================================================
+D4: PUMP-AROUND SHARE AGAINST THE REACTOR TEMPERATURE LOOP (K_c -1, tau_I 20 min)
+========================================================================================
+   share 0.0: jacket flow 1.092 m3/min   $576/h   GWP 4.352 t/h   damping 0.159   rightmost -0.0028
+   share 0.3: jacket flow 0.697 m3/min   $550/h   GWP 4.072 t/h   damping 0.087   rightmost -0.0028
+   share 0.5: jacket flow 0.470 m3/min   $533/h   GWP 3.886 t/h   damping 0.048   rightmost -0.0028
+   share 0.7: jacket flow 0.267 m3/min   $516/h   GWP 3.700 t/h   damping 0.013   rightmost -0.0028
+
+========================================================================================
+REACTOR TEMPERATURE LOOP TUNING: damping of the least damped mode
+========================================================================================
+   Kc -0.25  tau_I   5.0:  base plant -0.076 (+0.0312)   D4 -0.141 (+0.0757)
+   Kc -0.25  tau_I  10.0:  base plant +0.019 (-0.0028)   D4 -0.069 (+0.0356)
+   Kc -0.25  tau_I  20.0:  base plant +0.083 (-0.0028)   D4 -0.025 (+0.0126)
+   Kc -0.25  tau_I  40.0:  base plant +0.118 (-0.0028)   D4 -0.001 (+0.0005)
+   Kc -0.25  tau_I  80.0:  base plant +0.136 (-0.0028)   D4 +0.011 (-0.0028)
+   Kc -0.25  tau_I 160.0:  base plant +0.145 (-0.0027)   D4 +0.017 (-0.0028)
+   Kc -0.50  tau_I   5.0:  base plant +0.003 (-0.0020)   D4 -0.095 (+0.0702)
+   Kc -0.50  tau_I  10.0:  base plant +0.094 (-0.0028)   D4 -0.034 (+0.0244)
+   Kc -0.50  tau_I  20.0:  base plant +0.148 (-0.0028)   D4 +0.001 (-0.0006)
+   Kc -0.50  tau_I  40.0:  base plant +0.176 (-0.0028)   D4 +0.019 (-0.0028)
+   Kc -0.50  tau_I  80.0:  base plant +0.190 (-0.0028)   D4 +0.028 (-0.0028)
+   Kc -0.50  tau_I 160.0:  base plant +0.197 (-0.0027)   D4 +0.032 (-0.0028)
+   Kc -1.00  tau_I   5.0:  base plant +0.055 (-0.0028)   D4 -0.059 (+0.0618)
+   Kc -1.00  tau_I  10.0:  base plant +0.123 (-0.0028)   D4 -0.012 (+0.0127)
+   Kc -1.00  tau_I  20.0:  base plant +0.158 (-0.0028)   D4 +0.013 (-0.0028)
+   Kc -1.00  tau_I  40.0:  base plant +0.176 (-0.0028)   D4 +0.025 (-0.0028)
+   Kc -1.00  tau_I  80.0:  base plant +0.184 (-0.0028)   D4 +0.031 (-0.0028)
+   Kc -1.00  tau_I 160.0:  base plant +0.188 (-0.0028)   D4 +0.035 (-0.0028)
+   Kc -2.00  tau_I   5.0:  base plant +0.061 (-0.0028)   D4 -0.038 (+0.0557)
+   Kc -2.00  tau_I  10.0:  base plant +0.104 (-0.0028)   D4 -0.004 (+0.0057)
+   Kc -2.00  tau_I  20.0:  base plant +0.126 (-0.0028)   D4 +0.013 (-0.0028)
+   Kc -2.00  tau_I  40.0:  base plant +0.136 (-0.0028)   D4 +0.022 (-0.0028)
+   Kc -2.00  tau_I  80.0:  base plant +0.142 (-0.0028)   D4 +0.026 (-0.0028)
+   Kc -2.00  tau_I 160.0:  base plant +0.144 (-0.0028)   D4 +0.029 (-0.0028)
+   Kc -4.00  tau_I   5.0:  base plant +0.049 (-0.0028)   D4 -0.025 (+0.0533)
+   Kc -4.00  tau_I  10.0:  base plant +0.078 (-0.0028)   D4 -0.002 (+0.0033)
+   Kc -4.00  tau_I  20.0:  base plant +0.092 (-0.0028)   D4 +0.010 (-0.0028)
+   Kc -4.00  tau_I  40.0:  base plant +0.099 (-0.0028)   D4 +0.016 (-0.0028)
+   Kc -4.00  tau_I  80.0:  base plant +0.102 (-0.0028)   D4 +0.019 (-0.0028)
+   Kc -4.00  tau_I 160.0:  base plant +0.104 (-0.0028)   D4 +0.021 (-0.0028)
+   30 settings, 18 stable for D4; best D4 damping 0.035 at Kc -1.0, tau_I 160.0 (base plant 0.188 there)
+
+========================================================================================
+CONTROLLABILITY, STAGE 2 STRUCTURES
+========================================================================================
+D1: damping 0.155  rightmost -0.0028  design jacket flow 1.092 m3/min
+   throughput +10%   IAE C_A  20.20 kmol min/m3   IAE inlet T   4.62 K min   IAE bottoms x_A 4.71e-05   jacket at a limit 0%   min jacket flow 0.317   swing over last 300 min: T 0.004 K, jacket 0.001 m3/min   bottoms x_A peak 7.49e-07
+   fresh feed -10 K  IAE C_A   0.07 kmol min/m3   IAE inlet T   4.84 K min   IAE bottoms x_A 3.21e-08   jacket at a limit 0%   min jacket flow 0.809   swing over last 300 min: T 0.000 K, jacket 0.000 m3/min   bottoms x_A peak 4.04e-07
+D3: damping 0.157  rightmost -0.0028  design jacket flow 1.092 m3/min
+   throughput +10%   IAE C_A  20.20 kmol min/m3   IAE inlet T   2.69 K min   IAE bottoms x_A 4.74e-05   jacket at a limit 0%   min jacket flow 0.325   swing over last 300 min: T 0.004 K, jacket 0.001 m3/min   bottoms x_A peak 7.92e-07
+   fresh feed -10 K  IAE C_A   0.06 kmol min/m3   IAE inlet T   3.80 K min   IAE bottoms x_A 2.63e-08   jacket at a limit 0%   min jacket flow 0.835   swing over last 300 min: T 0.000 K, jacket 0.000 m3/min   bottoms x_A peak 4.04e-07
+D4: damping 0.013  rightmost -0.0028  design jacket flow 0.267 m3/min
+   throughput +10%   IAE C_A 291.24 kmol min/m3   IAE inlet T 404.86 K min   IAE bottoms x_A 1.34e-04   jacket at a limit 75%   min jacket flow 0.050   swing over last 300 min: T 15.822 K, jacket 4.955 m3/min   bottoms x_A peak 8.55e-07
+      last 300 min: reactor T 356.05-371.87 K, oscillation period 22.8 min
+   fresh feed -10 K  IAE C_A   0.43 kmol min/m3   IAE inlet T   5.89 K min   IAE bottoms x_A 1.18e-07   jacket at a limit 0%   min jacket flow 0.050   swing over last 300 min: T 0.000 K, jacket 0.000 m3/min   bottoms x_A peak 4.06e-07
+D5: damping 0.155  rightmost -0.0028  design jacket flow 1.092 m3/min
+   throughput +10%   IAE C_A  20.20 kmol min/m3   IAE inlet T   4.18 K min   IAE bottoms x_A 4.71e-05   jacket at a limit 0%   min jacket flow 0.333   swing over last 300 min: T 0.004 K, jacket 0.001 m3/min   bottoms x_A peak 7.49e-07
+   fresh feed -10 K  IAE C_A   0.05 kmol min/m3   IAE inlet T   2.66 K min   IAE bottoms x_A 2.22e-08   jacket at a limit 0%   min jacket flow 0.869   swing over last 300 min: T 0.000 K, jacket 0.000 m3/min   bottoms x_A peak 4.05e-07
+
+========================================================================================
+DYNAMIC VALIDATION: reactor temperature set-point +1 K at 30 min
+========================================================================================
+D3: reactor T 362.40 -> 363.40 K, peak 364.04 K, settles within 0.05 K after 12 min
+   C_A 2.3564 -> 2.2723   recycle 9.2304 -> 8.8714   production 8.4553 -> 8.8143 kmol/min
+   reactor inlet 336.94-336.98 K   jacket flow 0.092-1.710   boil-up 28.000 -> 27.641
+   distillate x_B 0.0178 -> 0.0083   product B recycled 0.165 -> 0.074 kmol/min   recycle drift over the last 300 min +0.0000 kmol/min per 1000 min   bottoms x_A 4.03e-07 -> 4.78e-07 (peak 4.80e-07)   run 3000 min
+   reactor effluent -> reactor feed          26.54 ->  27.31 GJ/h  (range 26.54-27.31)
+D4: reactor T 362.40 -> 363.40 K, peak 364.04 K, settles within 0.05 K after 34 min
+   C_A 2.3564 -> 2.2723   recycle 9.2304 -> 8.8714   production 8.4553 -> 8.8143 kmol/min
+   reactor inlet 336.90-337.06 K   jacket flow 0.050-0.914   boil-up 28.000 -> 27.641
+   distillate x_B 0.0178 -> 0.0083   product B recycled 0.165 -> 0.074 kmol/min   recycle drift over the last 300 min +0.0000 kmol/min per 1000 min   bottoms x_A 4.03e-07 -> 4.78e-07 (peak 4.80e-07)   run 3000 min
+   reactor effluent -> reboiler              21.01 ->  21.74 GJ/h  (range 21.01-21.90)
+   reactor heat -> reboiler                   9.85 ->  10.19 GJ/h  (range 8.39-10.19)
+   reactor effluent -> reactor feed          36.81 ->  36.84 GJ/h  (range 36.76-37.06)

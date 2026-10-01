@@ -1,0 +1,34 @@
+# A small dataset of `jacketed_cstr`: two structures, three feed-temperature upsets, and a
+# Latin hypercube of eight temperature-loop tunings for each combination: 48 runs.
+
+[study]
+name = "example"
+case = "jacketed_cstr"
+seed = 20260918
+
+[base]
+structure = "temperature PI"
+
+[[variants]]
+structure = "temperature PI"
+
+[[variants]]
+structure = "composition cascade"
+
+[sweep]
+"disturbance" = [
+    {name = "feed_temperature", change = -4.0, t = 10.0},
+    {name = "feed_temperature", change = 2.0, t = 10.0},
+    {name = "feed_temperature", change = 4.0, t = 10.0},
+]
+
+[sample]
+n = 8
+"tuning.reactor T.Kc" = [-2.0, -0.2]
+"tuning.reactor T.tau_I" = [3.0, 40.0]
+
+[run]
+t_end = 600.0
+dt = 1.0
+wall_budget = 60.0
+features = ["spectrum"]

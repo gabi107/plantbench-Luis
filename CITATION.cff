@@ -1,0 +1,27 @@
+cff-version: 1.2.0
+message: "If you use plantbench, please cite the paper that introduces it."
+title: "plantbench: a library of plantwide process simulations"
+version: 0.1.0
+license: BSD-3-Clause
+repository-code: "https://github.com/lbrice1/plantbench"
+url: "https://plantbench.readthedocs.io"
+authors:
+  - family-names: Territo
+    given-names: Kyle
+  - family-names: Briceno-Mena
+    given-names: Luis A.
+  - family-names: Romagnoli
+    given-names: Jose A.
+preferred-citation:
+  type: conference-paper
+  title: "A Plantwide Simulation Library for Control-Oriented Design: Analytical and Data-driven Use Cases"
+  authors:
+    - family-names: Territo
+      given-names: Kyle
+    - family-names: Briceno-Mena
+      given-names: Luis A.
+    - family-names: Romagnoli
+      given-names: Jose A.
+  collection-title: "2027 American Control Conference (ACC)"
+  year: 2027
+  notes: "Submitted"

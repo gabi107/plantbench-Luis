@@ -1,0 +1,86 @@
+==============================================================================
+1.  REACTOR AGAINST THE REFERENCE (ROMAGNOLI AND PALAZOGLU, 2020)
+==============================================================================
+steady state   C_A 2.3564   T 362.401   T_j 345.783
+reference      C_A 2.3530   T 362.400   T_j 345.690
+residual       < 1e-12
+eigenvalues    +0.0600  -0.1350  -0.7990
+reference      +0.0600  -0.1349  -0.7989
+branches, K    [338.22 362.4  377.08]
+k at T_s       0.1573 1/min
+conversion     52.9%
+
+==============================================================================
+2.  PLANTWIDE DESIGN
+==============================================================================
+reactor      C_A 2.3564 kmol/m3   T 362.40 K   T_j 345.78 K   V 22.82 m3
+reactor in   F0 3.200 m3/min   C_A0 5.0000 kmol/m3   T0 336.97 K
+molar        rho 5.6000 kmol/m3   column feed 17.920 kmol/min
+flows        fresh 8.690   recycle 9.230   purge 0.2343   product 8.455 kmol/min
+column       V 28.000   L 18.535   D 9.465   reflux ratio 1.958
+distillate   I 0.18546   A 0.79670   B 0.017846
+bottoms      I 6.36e-13   A 4.03e-07   B 1.000000
+reactant     consumed 8.4595   lost 0.1867 kmol/min (2.16% of feed)
+recycle ratio 1.062   residual < 1e-12
+internal liquid  above feed 18.535   below feed 36.455 kmol/min
+
+==============================================================================
+3.  REACTOR TEMPERATURE LOOP: STABILIZING GAIN
+==============================================================================
+rightmost closed-loop eigenvalue of the whole plant
+      Kc | tauI=2.0    tauI=3.2    tauI=5.0    tauI=10.0   tauI=20.0 
+   -0.10 | +0.0625    +0.0445    +0.0302    +0.0121    stable    
+   -0.30 | +0.0476    +0.0046    stable     stable     stable    
+   -0.60 | +0.0266    stable     stable     stable     stable    
+   -1.00 | +0.0083    stable     stable     stable     stable    
+   -2.00 | stable     stable     stable     stable     stable    
+
+==============================================================================
+4.  THROUGHPUT CHANGES
+==============================================================================
+throughput moved at the fresh feed (recycle free) or at the effluent flow (others)
+structure                    step  production    recycle    ampl      C_A        T  V_boil  x_B,A peak  x_B,A end
+recycle free                  +5%      +5.14%    +23.93%   4.66x   2.4779   362.40   32.94    4.51e-07   2.87e-07
+recycle free                 +10%     +10.28%    +53.62%   5.22x   2.5993   362.40   38.97    5.00e-07   2.06e-07
+recycle free                 +20%   loop at a limit: reactor T (Fj 0.05), tray T (V_boil 60.00); reactor 345.08 K, bottoms x_A 0.646
+recycle free                 +25%   loop at a limit: reactor T (Fj 0.05), tray T (V_boil 60.00); reactor 344.87 K, bottoms x_A 0.668
+effluent fixed                +5%      +1.84%     +8.02%   4.35x   2.4000   362.40   29.67    4.28e-07   3.57e-07
+effluent fixed               +10%      +3.58%    +16.13%   4.51x   2.4411   362.40   31.34    4.24e-07   3.18e-07
+effluent fixed               +20%      +6.77%    +32.63%   4.82x   2.5164   362.40   34.72    4.03e-07   2.58e-07
+effluent fixed               +25%      +8.23%    +41.00%   4.98x   2.5510   362.40   36.42    4.03e-07   2.35e-07
+effluent fixed + cascade      +5%      +4.13%     +5.93%   1.44x   2.3564   362.92   29.47    4.46e-07   3.89e-07
+effluent fixed + cascade     +10%      +8.17%    +11.93%   1.46x   2.3564   363.41   30.95    4.61e-07   3.75e-07
+effluent fixed + cascade     +20%     +16.01%    +24.16%   1.51x   2.3564   364.32   33.94    4.41e-07   3.49e-07
+effluent fixed + cascade     +25%     +19.82%    +30.38%   1.53x   2.3564   364.73   35.44    4.50e-07   3.37e-07
+
+==============================================================================
+5.  FIXING THE DISTILLATE
+==============================================================================
+10% fresh feed increase, 5000 min
+reflux drum holdup 12.00 -> 954.42 kmol, still rising: True
+reflux at its limit: 40.00 kmol/min
+
+==============================================================================
+6.  INERT INVENTORY
+==============================================================================
+purge open, +50% feed inert
+    inert mole fraction in recycle  0.1855 -> 0.2551 (peak) -> 0.2551 (end, 5000 min); 0.2551 at 3000 min
+    inert inventory, kmol           15.31 -> 22.53  (accumulated 7.22)
+    reflux drum holdup, kmol        12.00 -> 12.00
+purge closed
+    inert mole fraction in recycle  0.1855 -> 0.5756 (peak) -> 0.5756 (end, 3000 min); 0.5756 at 3000 min
+    inert inventory, kmol           15.31 -> 77.53  (accumulated 62.22, fed 62.22)
+    reflux drum holdup, kmol        12.00 -> 12.01
+    at  601 min: production 6.499 kmol/min (-23%), fresh feed 6.499, reactor 359.60 K, jacket flow 0.509 m3/min
+    at 1503 min: production 3.794 kmol/min (-55%), fresh feed 3.793, reactor 353.10 K, jacket flow 0.068 m3/min
+    at 3000 min: production 1.725 kmol/min (-80%), fresh feed 1.728, reactor 344.07 K, jacket flow 0.063 m3/min
+    jacket flow first at its 0.05 m3/min lower limit at 1593 min
+
+==============================================================================
+7.  PRODUCT QUALITY: TRAY TEMPERATURE LOOP
+==============================================================================
+column pressure 0.8 bar; tray 17 (1 = top, feed on 15)
+tray temperatures 382.06 / 386.33 / 388.54 K (trays 16-18); steepest step below the feed tray: trays 16-17, 4.27 K
+tuning Kc 2.0 kmol/min per K, tau_I 10.0 min; reflux ratioed to the column feed at 5.7923 kmol/min per m3/min
+design: bottoms x_A 4.03e-07, distillate x_B 0.0178
+effluent fixed + cascade: rightmost eigenvalue -0.0028, least damping 0.158
