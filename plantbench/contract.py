@@ -9,7 +9,7 @@ them from its own tests,
     def test_contract(check):
         check(CASE)
 
-or from the command line, `python -m plantbench check <case>`.  A case that fails one is
+or from the command line, `plantbench check <case>`.  A case that fails one is
 a defect in the case or in the interface; if the interface is at fault, it is fixed in
 core rather than special-cased for the plant.
 
@@ -21,7 +21,6 @@ its own tests and its dependencies.  `JUDGMENT` lists those that cannot.
 from __future__ import annotations
 
 import ast
-import importlib
 import sys
 import tomllib
 from dataclasses import dataclass
@@ -157,6 +156,39 @@ def generic_disturbances_act_on_the_inputs(case: Case) -> None:
     _require(isinstance(cs.GENERIC_DISTURBANCES, dict), "no generic disturbances")
 
 
+# A batched evaluation may iterate a member's nested solves (flashes, bubble points) further
+# than a single one stops, since a batch runs until every member has converged; a model
+# whose small inventories amplify those solves' tolerance differs from the single
+# evaluation by about this, relative to its largest derivative.
+BATCH_TOL = 1e-6
+
+
+def a_declared_batch_evaluates_as_its_rows(case: Case) -> None:
+    """A design that declares `batched = True` gives, at a batch of states near the design
+    point, the closed-loop derivatives and the measurements that one state at a time
+    gives.  A design that does not declare it is not checked."""
+    setup = build(case)
+    d, S = setup.design, setup.structure
+    if not ctl.supports_batch(d):
+        return
+    y0 = np.concatenate([d.x, ctl.initial_augmented(S, d)])
+    rng = np.random.default_rng(0)
+    Y = y0 + 1e-4 * np.abs(y0) * rng.standard_normal((3, len(y0)))
+    Fb = ctl.closed_loop_rhs_batch(0.0, Y, S, d.u, d.pp, None, d.rhs)
+    Fs = np.array([ctl.closed_loop_rhs(0.0, y, S, d.u, d.pp, None, d.rhs) for y in Y])
+    _require(Fb.shape == Fs.shape, f"a batch of 3 gives derivatives of shape {Fb.shape}")
+    worst = float(np.max(np.abs(Fb - Fs)) / max(1.0, float(np.max(np.abs(Fs)))))
+    _require(worst < BATCH_TOL,
+             f"batched derivatives differ from single ones by {worst:.3g} of the largest")
+    n = len(d.x)
+    u = ctl.batch_inputs(d.u, len(Y))
+    for name, f in case.measurements(d).items():
+        yb = np.broadcast_to(np.asarray(f(Y[:, :n], u, d.pp), dtype=float), (len(Y),))
+        ys = np.array([f(y[:n], d.u, d.pp) for y in Y], dtype=float)
+        _require(np.allclose(yb, ys, rtol=BATCH_TOL, atol=BATCH_TOL),
+                 f"measurement {name!r}: batched {yb} against single {ys}")
+
+
 CHECKS = (
     name_follows_the_convention,
     design_is_a_fixed_point_of_every_structure,
@@ -167,6 +199,7 @@ CHECKS = (
     ideal_instruments_add_nothing,
     a_short_run_stays_at_rest,
     generic_disturbances_act_on_the_inputs,
+    a_declared_batch_evaluates_as_its_rows,
 )
 
 
@@ -203,7 +236,7 @@ CARD_SECTIONS = ("provenance", "process", "states", "inputs", "options", "struct
                  "limitations")
 
 # What a case may import from inside the library.
-LIBRARY_LAYERS = ("plantbench.core", "plantbench.units", "plantbench.heat")
+LIBRARY_LAYERS = ("plantbench.backend", "plantbench.core", "plantbench.units", "plantbench.heat")
 # What it may import from outside, besides the standard library, without an extra.
 LIBRARY_DEPENDENCIES = ("numpy", "scipy")
 
@@ -216,14 +249,9 @@ JUDGMENT = (
     "correction and its evidence.",
     "The case card states the provenance of every published number the case reproduces.",
     "The name describes the process, and no number, version, author or source is in it.",
+    "A case presented in a publication of its own gives that publication in a Citation "
+    "section of its case card.",
 )
-
-
-def package_dir(case: Case) -> Path:
-    """The directory of the package that defines a case: that of its `make_design`."""
-    module = sys.modules.get(case.make_design.__module__) \
-        or importlib.import_module(case.make_design.__module__)
-    return Path(module.__file__).resolve().parent
 
 
 def project_dir(path: Path) -> Path | None:
@@ -264,10 +292,10 @@ def _distribution_name(requirement: str) -> str:
 
 
 def imports_only_what_a_case_may(case: Case) -> None:
-    """A case imports core, units and heat from the library, no other case, and nothing
+    """A case imports backend, core, units and heat from the library, no other case, and nothing
     outside the standard library, NumPy and SciPy that its project does not declare in
     an extra."""
-    here = package_dir(case)
+    here = cases.package_dir(case)
     project = project_dir(here)
     declared = _extras(project) if project is not None else set()
     own = here.name
@@ -293,13 +321,16 @@ def imports_only_what_a_case_may(case: Case) -> None:
 
 
 def has_a_case_card(case: Case) -> None:
-    """A README.md beside the definition, with a heading for each section of a card."""
-    card = package_dir(case) / "README.md"
+    """A README.md beside the definition, with a heading for each section of a card, and
+    a reference under its Citation heading if it has one."""
+    card = cases.package_dir(case) / "README.md"
     _require(card.exists(), f"no case card at {card}")
     headings = [line.lstrip("#").strip().lower()
                 for line in card.read_text().splitlines() if line.startswith("## ")]
     missing = [s for s in CARD_SECTIONS if not any(s in h for h in headings)]
     _require(not missing, f"{card} has no section on {', '.join(missing)}")
+    _require(cases.card_section(card.read_text(), "citation") != "",
+             f"{card} has a Citation section with nothing in it")
 
 
 def has_tests_of_its_own(case: Case) -> None:
@@ -307,7 +338,7 @@ def has_tests_of_its_own(case: Case) -> None:
 
     Looked for in `tests/cases/<id>/` for a built-in case, and in the project's `tests/`
     for one in its own package, in a file other than one holding only the contract."""
-    here = package_dir(case)
+    here = cases.package_dir(case)
     project = project_dir(here)
     if case.id in cases._MODULES:
         where = project / "tests" / "cases" / case.id if project else None

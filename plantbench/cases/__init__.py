@@ -24,6 +24,7 @@ import re
 import sys
 from dataclasses import dataclass
 from importlib.metadata import EntryPoint, entry_points
+from pathlib import Path
 from typing import Callable
 
 from plantbench.core.case import Case
@@ -31,6 +32,8 @@ from plantbench.core.case import Case
 _MODULES = {
     "reactor_separator_recycle": "plantbench.cases.reactor_separator_recycle.definition",
     "jacketed_cstr": "plantbench.cases.jacketed_cstr.definition",
+    "ngl_demethanizer": "plantbench.cases.ngl_demethanizer.definition",
+    "ngl_deethanizer": "plantbench.cases.ngl_deethanizer.definition",
 }
 ENTRY_POINT_GROUP = "plantbench.cases"
 
@@ -55,9 +58,11 @@ _SESSION: dict[str, _Session] = {}
 def check_id(case_id: str) -> None:
     """Refuse an id that does not follow the naming convention of docs/adding-a-case.md."""
     if not isinstance(case_id, str) or not _ID.fullmatch(case_id) or len(case_id) > ID_MAX:
-        raise ValueError(f"{case_id!r} is not a case id: lowercase words joined by single "
-                         f"underscores, beginning with a letter, not the word 'case', at "
-                         f"most {ID_MAX} characters")
+        raise ValueError(
+            f"{case_id!r} is not a case id: lowercase words joined by single "
+            f"underscores, beginning with a letter, not the word 'case', at "
+            f"most {ID_MAX} characters"
+        )
 
 
 def _entry_points() -> dict[str, EntryPoint]:
@@ -67,8 +72,10 @@ def _entry_points() -> dict[str, EntryPoint]:
         if ep.name in _MODULES:
             raise ValueError(f"{_describe(ep)} declares {ep.name!r}, a built-in case")
         if ep.name in found and found[ep.name].value != ep.value:
-            raise ValueError(f"case {ep.name!r} is declared by two packages: "
-                             f"{_describe(found[ep.name])} and {_describe(ep)}")
+            raise ValueError(
+                f"case {ep.name!r} is declared by two packages: "
+                f"{_describe(found[ep.name])} and {_describe(ep)}"
+            )
         found[ep.name] = ep
     return found
 
@@ -91,8 +98,9 @@ def load_case(case_id: str) -> Case:
     if case_id in _SESSION:
         entry = _SESSION[case_id]
         if entry.case is None:
-            entry.case = _checked(entry.factory(), case_id,
-                                  f"{entry.module}.{entry.factory.__name__}")
+            entry.case = _checked(
+                entry.factory(), case_id, f"{entry.module}.{entry.factory.__name__}"
+            )
         return entry.case
     raise KeyError(f"no case {case_id!r}; cases: {list_cases()}")
 
@@ -120,6 +128,54 @@ def source(case_id: str) -> dict:
     if case_id in _SESSION:
         return {"kind": "session", "module": _SESSION[case_id].module}
     raise KeyError(f"no case {case_id!r}; cases: {list_cases()}")
+
+
+def package_dir(case: Case) -> Path:
+    """The directory of the package that defines a case: that of its `make_design`."""
+    module = sys.modules.get(case.make_design.__module__) or importlib.import_module(
+        case.make_design.__module__
+    )
+    return Path(module.__file__).resolve().parent
+
+
+def card_section(card: str, name: str) -> str | None:
+    """The text under the `## <name>` heading of a case card, or None without one.
+
+    The heading is matched without regard to case; the section runs to the next heading
+    of the same or a higher level outside a code block."""
+    lines, out, fence = card.splitlines(), None, False
+    for line in lines:
+        if line.startswith("```"):
+            fence = not fence
+        if not fence and line.startswith(("# ", "## ")):
+            if out is not None:
+                break
+            if line[3:].strip().lower() == name.lower() and line.startswith("## "):
+                out = []
+            continue
+        if out is not None:
+            out.append(line)
+    return None if out is None else "\n".join(out).strip()
+
+
+def citation(case: Case) -> dict | None:
+    """The publication a case was presented in, from the Citation section of its card.
+
+    `reference` is the first paragraph of the section, the reference as it is written to
+    be read, and `text` the whole section, BibTeX included.  None when the card has no
+    Citation section, or the case has no card; and for a session case, whose module may
+    sit beside a README that is not a case card.  A case not registered at all, such as
+    one imported to be checked, is read like an installed one."""
+    try:
+        if source(case.id)["kind"] == "session":
+            return None
+    except KeyError:
+        pass
+    card = package_dir(case) / "README.md"
+    text = card_section(card.read_text(), "citation") if card.exists() else None
+    if not text:
+        return None
+    return {"reference": " ".join(text.split("\n\n")[0].split()), "text": text}
 
 
 def session_modules() -> list[str]:

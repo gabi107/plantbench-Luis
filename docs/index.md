@@ -15,26 +15,23 @@ traj = pb.run(case, config, t_end=1500.0, dt=1.0)
 ```
 
 ```
-python -m plantbench generate examples/04_dataset.toml --workers 8
+plantbench generate examples/04_dataset.toml --workers 8
 ```
 
 ## Installation
 
-Python 3.11 or later, from a clone of [the repository](https://github.com/lbrice1/plantbench):
-
-```
-python3 -m venv .venv
-.venv/bin/pip install -e .
+```{include} _installation.md
 ```
 
 ## Contents
 
+- [Tutorial](tutorial.md): [using plantbench](tutorial/using.md), from installation to a scored task, and [contributing a case](tutorial/contributing.md), from the template to the library, each in one session.
 - [User guide](user-guide.md): running cases, configurations, non-idealities, disturbances, datasets and tasks.
 - [Design principles](philosophy.md): what a case is, the conventions the code keeps, and why.
 - [Cases](cases/index.md): the card of each case.
 - [Examples](examples.md): short scripts, each run by the test suite.
 - [Developing a case](developing-a-case.md): a case in a package of its own, used with every part of the library without adding it.
-- [Adding a case](adding-a-case.md): naming, the checklist, the contract a new case must pass, and contributing a case to the library.
+- [Adding a case](adding-a-case.md): naming, the checklist, the contract a new case must pass, and contributing a case to the library with `plantbench contribute`.
 - [API reference](api.md).
 
 ## Citation
@@ -53,12 +50,17 @@ Territo, K., Briceno-Mena, L. A. and Romagnoli, J. A. (2027). A Plantwide Simula
 }
 ```
 
+:::{note}
+Some cases were introduced in a publication of their own. The [card](cases/index.md) of such a case gives that publication in a Citation section, and `plantbench describe <case>` prints it. When you use such a case, please cite its publication.
+:::
+
 `plantbench` is distributed under the BSD 3-Clause license.
 
 ```{toctree}
 :hidden:
 :maxdepth: 2
 
+tutorial
 user-guide
 philosophy
 cases/index
